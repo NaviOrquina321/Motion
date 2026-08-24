@@ -10,13 +10,13 @@ export const SupraHeroComposition = ({
   hudTitle = 'GR SUPRA MK5',
 }) => {
   const frame = useCurrentFrame();
-  const { fps, durationInFrames, width, height } = useVideoConfig();
+  const { fps, durationInFrames } = useVideoConfig();
 
-  // Speed multiplier based on drive mode
+  // Speed factor based on drive mode
   const speedFactor = driveMode === 'Track' ? 2.5 : driveMode === 'Sport' ? 1.8 : 1.0;
 
   // Rev pulse effect
-  const revPulse = isRevving ? Math.sin(frame * 0.8) * 15 : 0;
+  const revPulse = isRevving ? Math.sin(frame * 0.8) * 12 : 0;
 
   // Speedometer calculation
   const targetSpeed = driveMode === 'Track' ? 285 : driveMode === 'Sport' ? 220 : 120;
@@ -97,16 +97,16 @@ export const SupraHeroComposition = ({
       <div
         style={{
           position: 'absolute',
-          width: '600px',
-          height: '600px',
+          width: '700px',
+          height: '700px',
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${carColor}44 0%, ${neonColor}22 40%, transparent 70%)`,
-          filter: 'blur(60px)',
+          background: `radial-gradient(circle, ${carColor}55 0%, ${neonColor}22 45%, transparent 70%)`,
+          filter: 'blur(70px)',
           transform: `scale(${1 + revPulse * 0.02})`,
         }}
       />
 
-      {/* Car Silhouette / SVG Visual */}
+      {/* DETAILED TOYOTA GR SUPRA GRAPHIC */}
       <div
         style={{
           position: 'relative',
@@ -117,24 +117,40 @@ export const SupraHeroComposition = ({
         className="flex flex-col items-center justify-center"
       >
         <svg
-          width="800"
-          height="320"
-          viewBox="0 0 800 320"
+          width="900"
+          height="380"
+          viewBox="0 0 900 380"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)]"
+          className="drop-shadow-[0_25px_50px_rgba(0,0,0,0.9)]"
         >
           <defs>
-            <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={carColor} />
-              <stop offset="100%" stopColor="#111319" />
+            <linearGradient id="bodyPaint" x1="0%" y1="0%" x2="100%" y2="80%">
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.3" />
+              <stop offset="20%" stopColor={carColor} />
+              <stop offset="75%" stopColor={carColor} />
+              <stop offset="100%" stopColor="#0B0C10" />
             </linearGradient>
-            <linearGradient id="glassGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#00F0FF" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#050810" stopOpacity="0.9" />
+
+            <linearGradient id="roofShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#0B0C10" />
+              <stop offset="100%" stopColor="#1A1D24" />
             </linearGradient>
+
+            <linearGradient id="glassTint" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#00F0FF" stopOpacity="0.4" />
+              <stop offset="40%" stopColor="#0F172A" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#020617" stopOpacity="0.95" />
+            </linearGradient>
+
+            <linearGradient id="rimMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#F3F4F6" />
+              <stop offset="50%" stopColor="#6B7280" />
+              <stop offset="100%" stopColor="#111827" />
+            </linearGradient>
+
             <filter id="neonGlow">
-              <feGaussianBlur stdDeviation="6" result="coloredBlur" />
+              <feGaussianBlur stdDeviation="8" result="coloredBlur" />
               <feMerge>
                 <feMergeNode in="coloredBlur" />
                 <feMergeNode in="SourceGraphic" />
@@ -144,94 +160,165 @@ export const SupraHeroComposition = ({
 
           {/* Underglow Neon Light */}
           <ellipse
-            cx="400"
-            cy="270"
-            rx="340"
-            ry="25"
+            cx="450"
+            cy="315"
+            rx="400"
+            ry="28"
             fill={neonColor}
-            opacity={0.75 + Math.sin(frame * 0.2) * 0.15}
+            opacity={0.85 + Math.sin(frame * 0.2) * 0.15}
             filter="url(#neonGlow)"
           />
 
           {/* Exhaust Flame FX */}
           {showFlame && (isRevving || driveMode === 'Track') && (
-            <g transform="translate(680, 220)">
+            <g transform="translate(805, 272)">
               <polygon
-                points="0,0 60,-15 90,0 60,15"
+                points="0,0 75,-20 110,0 75,20"
                 fill="#FF3300"
-                opacity={0.8 + Math.random() * 0.2}
+                opacity={0.85 + Math.random() * 0.15}
                 filter="url(#neonGlow)"
               />
               <polygon
-                points="0,0 40,-8 60,0 40,8"
+                points="0,0 50,-10 75,0 50,10"
                 fill="#FFCC00"
-                opacity={0.9}
+                opacity={0.95}
               />
-              <circle cx="15" cy="0" r="10" fill="#00F0FF" opacity="0.9" />
+              <circle cx="20" cy="0" r="12" fill="#00F0FF" opacity="0.95" />
             </g>
           )}
 
-          {/* Car Body Contour */}
+          {/* Supra Main Body Base Shadow */}
           <path
-            d="M80 230 C 120 230, 160 210, 220 180 C 280 150, 360 110, 470 110 C 580 110, 640 160, 710 190 C 750 205, 760 230, 760 230 L 780 245 C 780 245, 760 260, 700 260 L 120 260 C 90 260, 70 245, 80 230 Z"
-            fill="url(#bodyGradient)"
-            stroke={carColor}
-            strokeWidth="3"
+            d="M 60 305 L 840 305 C 850 305, 855 295, 845 285 L 800 240 C 760 210, 710 180, 610 160 C 510 120, 420 120, 310 150 C 230 170, 150 210, 100 245 L 60 275 C 50 285, 50 305, 60 305 Z"
+            fill="#050608"
           />
 
-          {/* Roof and Cabin Line */}
+          {/* Supra Sculpted Side Panel Body */}
           <path
-            d="M260 165 C 320 120, 420 115, 520 135 C 570 145, 600 170, 610 180 Z"
-            fill="url(#glassGradient)"
-            stroke="#2A303C"
+            d="M 80 295 C 100 280, 130 255, 180 230 C 240 200, 320 160, 440 150 C 560 140, 650 175, 730 210 C 780 230, 820 255, 835 275 L 820 295 H 80 Z"
+            fill="url(#bodyPaint)"
+            stroke={carColor}
+            strokeWidth="2.5"
+          />
+
+          {/* Double Bubble Roof & A-Pillars */}
+          <path
+            d="M 280 175 C 330 130, 420 125, 520 140 C 580 150, 620 175, 640 195 C 610 185, 520 170, 420 170 C 340 170, 300 180, 280 175 Z"
+            fill="url(#roofShadow)"
+            stroke="#27272A"
             strokeWidth="2"
           />
 
-          {/* Supra Rear Wing / Spoiler Accent */}
+          {/* Side Glass / Windshield */}
           <path
-            d="M710 175 L 775 165 L 780 178 L 720 188 Z"
-            fill={carColor}
-            filter="url(#neonGlow)"
+            d="M 295 178 C 350 140, 430 135, 515 148 C 560 158, 595 178, 610 190 C 540 180, 410 180, 295 178 Z"
+            fill="url(#glassTint)"
+            stroke="#38BDF8"
+            strokeWidth="1.5"
           />
 
-          {/* Aggressive Headlight LED */}
+          {/* Front Bumper & Low Splitter */}
           <path
-            d="M110 210 L 160 205 L 140 215 Z"
-            fill="#FFFFFF"
-            filter="url(#neonGlow)"
-          />
-          <path
-            d="M100 215 L 170 210"
+            d="M 60 295 C 50 295, 45 285, 55 275 L 110 245 C 130 235, 160 230, 190 230 L 190 295 Z"
+            fill="#111827"
             stroke={neonColor}
-            strokeWidth="4"
-            strokeLinecap="round"
+            strokeWidth="2"
             filter="url(#neonGlow)"
           />
 
-          {/* Tail Light Strip */}
+          {/* Aggressive Front LED Headlights */}
+          <g>
+            <path
+              d="M 120 235 L 180 228 L 165 242 L 110 245 Z"
+              fill="#FFFFFF"
+              filter="url(#neonGlow)"
+            />
+            <path
+              d="M 105 245 L 185 235"
+              stroke={neonColor}
+              strokeWidth="4"
+              strokeLinecap="round"
+              filter="url(#neonGlow)"
+            />
+            {/* DRL LED Strip */}
+            <path
+              d="M 115 248 L 160 242"
+              stroke="#FFFFFF"
+              strokeWidth="2"
+              filter="url(#neonGlow)"
+            />
+          </g>
+
+          {/* Characteristic Supra Side Air Intake Vent */}
           <path
-            d="M710 200 L 760 210 L 755 218 L 705 208 Z"
+            d="M 580 220 C 590 200, 605 190, 615 190 C 605 210, 595 235, 580 250 Z"
+            fill="#090A0F"
+            stroke={carColor}
+            strokeWidth="2"
+          />
+
+          {/* Rear Fender Flare & Ducktail Spoiler */}
+          <path
+            d="M 720 215 C 750 200, 785 190, 810 190 C 825 190, 835 195, 830 210 C 810 230, 770 250, 720 250 Z"
+            fill={carColor}
+            stroke="#F43F5E"
+            strokeWidth="1.5"
+          />
+
+          {/* Rear LED Tail Lights */}
+          <path
+            d="M 780 235 L 830 245 L 825 255 L 775 245 Z"
             fill="#FF0033"
             filter="url(#neonGlow)"
           />
 
-          {/* Wheels */}
-          <g transform="translate(190, 240)">
-            <circle cx="0" cy="0" r="42" fill="#0D0E12" stroke="#3A3F4D" strokeWidth="6" />
-            <circle cx="0" cy="0" r="28" fill="#181B22" stroke={neonColor} strokeWidth="2" />
-            {/* Rotating Wheel Spokes */}
+          {/* Detailed Front Wheel & Brembo Caliper */}
+          <g transform="translate(210, 280)">
+            {/* Outer Tire */}
+            <circle cx="0" cy="0" r="48" fill="#0A0C10" stroke="#1F2937" strokeWidth="8" />
+            {/* Brake Rotor */}
+            <circle cx="0" cy="0" r="34" fill="#374151" stroke="#9CA3AF" strokeWidth="2" />
+            {/* Red Brake Caliper */}
+            <path d="M -22 -20 C -15 -32, 5 -32, 15 -25 L 8 -12 C 0 -18, -10 -18, -15 -10 Z" fill="#EF4444" />
+            {/* Rotating 5-Spoke Alloy Rim */}
             <g transform={`rotate(${(frame * 25 * speedFactor) % 360})`}>
-              <line x1="-22" y1="0" x2="22" y2="0" stroke="#E5E7EB" strokeWidth="4" />
-              <line x1="0" y1="-22" x2="0" y2="22" stroke="#E5E7EB" strokeWidth="4" />
+              <circle cx="0" cy="0" r="28" fill="none" stroke="url(#rimMetal)" strokeWidth="4" />
+              {Array.from({ length: 5 }).map((_, idx) => (
+                <line
+                  key={idx}
+                  x1="0"
+                  y1="0"
+                  x2={28 * Math.cos((idx * 72 * Math.PI) / 180)}
+                  y2={28 * Math.sin((idx * 72 * Math.PI) / 180)}
+                  stroke="#F3F4F6"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+              ))}
+              <circle cx="0" cy="0" r="8" fill="#111827" stroke={neonColor} strokeWidth="2" />
             </g>
           </g>
 
-          <g transform="translate(620, 240)">
-            <circle cx="0" cy="0" r="42" fill="#0D0E12" stroke="#3A3F4D" strokeWidth="6" />
-            <circle cx="0" cy="0" r="28" fill="#181B22" stroke={neonColor} strokeWidth="2" />
+          {/* Detailed Rear Wheel & Brembo Caliper */}
+          <g transform="translate(680, 280)">
+            <circle cx="0" cy="0" r="48" fill="#0A0C10" stroke="#1F2937" strokeWidth="8" />
+            <circle cx="0" cy="0" r="34" fill="#374151" stroke="#9CA3AF" strokeWidth="2" />
+            <path d="M -22 -20 C -15 -32, 5 -32, 15 -25 L 8 -12 C 0 -18, -10 -18, -15 -10 Z" fill="#EF4444" />
             <g transform={`rotate(${(frame * 25 * speedFactor) % 360})`}>
-              <line x1="-22" y1="0" x2="22" y2="0" stroke="#E5E7EB" strokeWidth="4" />
-              <line x1="0" y1="-22" x2="0" y2="22" stroke="#E5E7EB" strokeWidth="4" />
+              <circle cx="0" cy="0" r="28" fill="none" stroke="url(#rimMetal)" strokeWidth="4" />
+              {Array.from({ length: 5 }).map((_, idx) => (
+                <line
+                  key={idx}
+                  x1="0"
+                  y1="0"
+                  x2={28 * Math.cos((idx * 72 * Math.PI) / 180)}
+                  y2={28 * Math.sin((idx * 72 * Math.PI) / 180)}
+                  stroke="#F3F4F6"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+              ))}
+              <circle cx="0" cy="0" r="8" fill="#111827" stroke={neonColor} strokeWidth="2" />
             </g>
           </g>
         </svg>
@@ -240,7 +327,7 @@ export const SupraHeroComposition = ({
         <div
           style={{
             transform: `scale(${badgeSpring})`,
-            marginTop: '-10px',
+            marginTop: '-15px',
           }}
           className="text-center"
         >
