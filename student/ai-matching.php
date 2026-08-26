@@ -114,6 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadingSpinner = document.getElementById('loadingSpinner');
     const resultsCount = document.getElementById('resultsCount');
 
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
     function fetchMatches() {
         loadingSpinner.classList.remove('d-none');
         resultsContainer.innerHTML = '';
@@ -130,31 +135,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     data.matches.forEach(tutor => {
                         const score = tutor.match_percentage;
-                        let badgeClass = 'bg-success';
-                        if (score < 80) badgeClass = 'bg-primary';
-                        if (score < 65) badgeClass = 'bg-warning text-dark';
+                        const safeName = escapeHtml(tutor.name);
+                        const safeTitle = escapeHtml(tutor.title);
+                        const safeBio = escapeHtml(tutor.bio);
+                        const safePhoto = escapeHtml(tutor.profile_photo);
 
-                        const reasonsHtml = tutor.match_reasons.map(r => `<span class="badge bg-light text-dark border me-1 mb-1"><i class="fa-solid fa-check text-success me-1"></i>${r}</span>`).join('');
+                        const reasonsHtml = tutor.match_reasons.map(r => `<span class="badge bg-light text-dark border me-1 mb-1"><i class="fa-solid fa-check text-success me-1"></i>${escapeHtml(r)}</span>`).join('');
 
                         const cardHtml = `
                             <div class="card-custom p-4">
                                 <div class="row align-items-center g-3">
                                     <div class="col-md-3 text-center text-md-start">
-                                        <img src="${tutor.profile_photo}" class="rounded-circle object-fit-cover shadow-sm mb-2" width="80" height="80" alt="${tutor.name}">
+                                        <img src="${safePhoto}" class="rounded-circle object-fit-cover shadow-sm mb-2" width="80" height="80" alt="${safeName}">
                                         <div class="text-warning font-weight-bold font-size-sm mb-1">
                                             <i class="fa-solid fa-star"></i> ${parseFloat(tutor.rating).toFixed(1)}
                                             <span class="text-muted font-weight-normal">(${tutor.total_reviews})</span>
                                         </div>
-                                        <span class="badge bg-light text-muted border">${tutor.experience} yrs exp</span>
+                                        <span class="badge bg-light text-muted border">${parseInt(tutor.experience)} yrs exp</span>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="d-flex align-items-center gap-2 mb-1">
-                                            <h5 class="fw-bold mb-0 text-dark">${tutor.name}</h5>
+                                            <h5 class="fw-bold mb-0 text-dark">${safeName}</h5>
                                             <i class="fa-solid fa-circle-check text-primary font-size-sm" title="Verified Tutor"></i>
                                             <span class="match-score-badge ms-auto d-md-none">${score}% Match</span>
                                         </div>
-                                        <span class="text-primary fw-semibold font-size-sm d-block mb-2">${tutor.title}</span>
-                                        <p class="text-muted font-size-sm mb-2 line-clamp-2">${tutor.bio}</p>
+                                        <span class="text-primary fw-semibold font-size-sm d-block mb-2">${safeTitle}</span>
+                                        <p class="text-muted font-size-sm mb-2 line-clamp-2">${safeBio}</p>
                                         <div class="d-flex flex-wrap align-items-center">
                                             ${reasonsHtml}
                                         </div>

@@ -17,7 +17,7 @@ function getCurrentUser() {
 
 function requireLogin() {
     if (!isset($_SESSION['user_id'])) {
-        header("Location: /login.php");
+        header("Location: ../login.php");
         exit;
     }
 }
@@ -25,7 +25,7 @@ function requireLogin() {
 function requireRole($role) {
     requireLogin();
     if ($_SESSION['role'] !== $role) {
-        header("Location: /index.php");
+        header("Location: ../index.php");
         exit;
     }
 }
