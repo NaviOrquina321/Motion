@@ -3,17 +3,25 @@
 require_once __DIR__ . '/../includes/db.php';
 
 $pdo = getDBConnection();
+$driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 
-// Read schema and run
-$schema = file_get_contents(__DIR__ . '/schema.sql');
-$pdo->exec($schema);
+if ($driver === 'sqlite') {
+    // Read schema and run for SQLite
+    $schema = file_get_contents(__DIR__ . '/schema.sql');
+    $pdo->exec($schema);
 
-// Clear existing tables
-$tables = ['reports_logs', 'reviews', 'messages', 'notifications', 'payments', 'bookings', 'tutor_availability', 'tutor_subjects', 'subjects', 'tutors', 'students', 'users'];
-foreach ($tables as $tbl) {
-    $pdo->exec("DELETE FROM $tbl;");
-    // Reset auto-increment in sqlite
-    $pdo->exec("DELETE FROM sqlite_sequence WHERE name='$tbl';");
+    // Clear existing tables
+    $tables = ['reports_logs', 'reviews', 'messages', 'notifications', 'payments', 'bookings', 'tutor_availability', 'tutor_subjects', 'subjects', 'tutors', 'students', 'users'];
+    foreach ($tables as $tbl) {
+        $pdo->exec("DELETE FROM $tbl;");
+        $pdo->exec("DELETE FROM sqlite_sequence WHERE name='$tbl';");
+    }
+} else {
+    // Read schema and run for MySQL
+    $sql = file_get_contents(__DIR__ . '/tutorlink.sql');
+    $pdo->exec($sql);
+    echo "MySQL database schema and seed data loaded successfully!\n";
+    exit(0);
 }
 
 // Default Password for all demo accounts: 'password123'

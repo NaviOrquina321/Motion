@@ -1,4 +1,5 @@
--- Database Schema for TutorLink
+-- Database Schema for TutorLink (MySQL / MariaDB & SQLite compatible)
+
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(100) NOT NULL,

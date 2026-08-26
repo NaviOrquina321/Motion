@@ -18,18 +18,25 @@ $student = $stmtSt->fetch();
 $month = (int)($_GET['month'] ?? date('n'));
 $year = (int)($_GET['year'] ?? date('Y'));
 
-// Fetch confirmed and pending bookings for this student
+$firstDayOfMonth = mktime(0, 0, 0, $month, 1, $year);
+$daysInMonth = date('t', $firstDayOfMonth);
+$dayOfWeek = date('w', $firstDayOfMonth); // 0 (Sun) to 6 (Sat)
+$monthName = date('F', $firstDayOfMonth);
+
+$startDate = sprintf('%04d-%02d-01', $year, $month);
+$endDate = sprintf('%04d-%02d-%02d', $year, $month, $daysInMonth);
+
+// Fetch confirmed and pending bookings for this student (using standard SQL date range for MySQL and SQLite compatibility)
 $stmtBk = $pdo->prepare("
     SELECT b.*, u.name as tutor_name, s.name as subject_name
     FROM bookings b
     JOIN tutors t ON b.tutor_id = t.id
     JOIN users u ON t.user_id = u.id
     JOIN subjects s ON b.subject_id = s.id
-    WHERE b.student_id = ? AND strftime('%m', b.booking_date) = ? AND strftime('%Y', b.booking_date) = ?
+    WHERE b.student_id = ? AND b.booking_date >= ? AND b.booking_date <= ?
     ORDER BY b.booking_date ASC, b.start_time ASC
 ");
-$monthStr = sprintf('%02d', $month);
-$stmtBk->execute([$student['id'], $monthStr, (string)$year]);
+$stmtBk->execute([$student['id'], $startDate, $endDate]);
 $bookings = $stmtBk->fetchAll();
 
 // Group bookings by date string YYYY-MM-DD
@@ -37,12 +44,6 @@ $eventsByDate = [];
 foreach ($bookings as $b) {
     $eventsByDate[$b['booking_date']][] = $b;
 }
-
-// Calendar Calculation
-$firstDayOfMonth = mktime(0, 0, 0, $month, 1, $year);
-$daysInMonth = date('t', $firstDayOfMonth);
-$dayOfWeek = date('w', $firstDayOfMonth); // 0 (Sun) to 6 (Sat)
-$monthName = date('F', $firstDayOfMonth);
 
 $prevMonth = $month == 1 ? 12 : $month - 1;
 $prevYear = $month == 1 ? $year - 1 : $year;
