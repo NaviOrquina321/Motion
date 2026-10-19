@@ -63,6 +63,20 @@ INSERT IGNORE INTO settings (setting_key, setting_value) VALUES
 ALTER TABLE products ADD COLUMN IF NOT EXISTS barcode VARCHAR(50) NULL UNIQUE AFTER name;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS cost_price DECIMAL(10,2) NULL DEFAULT 0.00 AFTER price;
 
+-- Update existing sample products with images if missing
+UPDATE products SET image = 'noodles.jpg' WHERE id = 1 AND (image IS NULL OR image = '');
+UPDATE products SET image = 'sardines.jpg' WHERE id = 2 AND (image IS NULL OR image = '');
+UPDATE products SET image = 'biscuits.jpg' WHERE id = 3 AND (image IS NULL OR image = '');
+UPDATE products SET image = 'water.jpg' WHERE id = 4 AND (image IS NULL OR image = '');
+UPDATE products SET image = 'juice.jpg' WHERE id = 5 AND (image IS NULL OR image = '');
+UPDATE products SET image = 'coffee.jpg' WHERE id = 6 AND (image IS NULL OR image = '');
+UPDATE products SET image = 'notebook.jpg' WHERE id = 7 AND (image IS NULL OR image = '');
+UPDATE products SET image = 'ballpen.jpg' WHERE id = 8 AND (image IS NULL OR image = '');
+UPDATE products SET image = 'soap.jpg' WHERE id = 9 AND (image IS NULL OR image = '');
+UPDATE products SET image = 'shampoo.jpg' WHERE id = 10 AND (image IS NULL OR image = '');
+UPDATE products SET image = 'dishwashing.jpg' WHERE id = 11 AND (image IS NULL OR image = '');
+UPDATE products SET image = 'detergent.jpg' WHERE id = 12 AND (image IS NULL OR image = '');
+
 -- 6. Sales table modifications (discounts, tax, payment method, reference number, status, duplicate cart token)
 ALTER TABLE sales ADD COLUMN IF NOT EXISTS discount_id INT UNSIGNED NULL AFTER customer_id;
 ALTER TABLE sales ADD COLUMN IF NOT EXISTS discount_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER discount_id;
