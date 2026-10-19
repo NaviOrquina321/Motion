@@ -18,7 +18,7 @@ async function load() {
         <button class="btn btn-sm btn-light" onclick="edit(${c.id})">Edit</button>
         ${currentUserRole === 'admin' ? `<button class="btn btn-sm btn-danger" onclick="del(${c.id})">Delete</button>` : ''}
       </td></tr>`).join('')
-      : '<tr><td colspan="7" class="empty">No customers found.</td></tr>';
+      : '<tr><td colspan="7" class="empty">No customers found. Add your first customer.</td></tr>';
   } catch (e) { toastError(e); }
 }
 
@@ -46,6 +46,7 @@ window.viewHistory = async id => {
               <th>Txn #</th>
               <th>Date</th>
               <th>Method</th>
+              <th>Status</th>
               <th>Cashier</th>
               <th class="num">Amount</th>
             </tr>
@@ -55,6 +56,7 @@ window.viewHistory = async id => {
               <td>#${s.id}</td>
               <td>${esc(s.created_at)}</td>
               <td><span class="badge badge-info">${esc(s.payment_method)}</span></td>
+              <td><span class="badge ${s.payment_status === 'verified' ? 'badge-ok' : (s.payment_status === 'rejected' ? 'badge-danger' : 'badge-low')}">${esc(s.payment_status)}</span></td>
               <td>${esc(s.cashier_name)}</td>
               <td class="num"><strong>${money(s.total_amount)}</strong></td>
             </tr>`).join('')}
@@ -67,9 +69,10 @@ window.viewHistory = async id => {
   } catch (e) { toastError(e); }
 };
 
-window.del = async id => {
-  if (!confirm('Delete this customer? Their past sales will stay in the history as Walk-in.')) return;
-  try { toast((await api('customers/api.php?action=delete', { json: { id } })).message); load(); } catch (e) { toastError(e); }
+window.del = id => {
+  confirmModal('Delete Customer', 'Delete this customer? Their past sales will stay in history as Walk-in Customer.', async () => {
+    try { toast((await api('customers/api.php?action=delete', { json: { id } })).message); load(); } catch (e) { toastError(e); }
+  });
 };
 
 $('form').addEventListener('submit', async e => {

@@ -15,8 +15,26 @@ header('Content-Type: application/json; charset=utf-8');
 
 set_exception_handler(function ($e) {
     error_log($e->getMessage());
-    fail('Server error. Please try again.', 500);
+    fail('Something went wrong.', 500);
 });
+
+function ensure_assets_copied() {
+    static $done = false;
+    if ($done) return;
+    $done = true;
+    $assetDir = __DIR__ . '/../../assets/products/';
+    $uploadDir = __DIR__ . '/../uploads/';
+    if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
+    if (is_dir($assetDir)) {
+        foreach (glob($assetDir . '*.*') as $f) {
+            $dest = $uploadDir . basename($f);
+            if (!file_exists($dest)) {
+                @copy($f, $dest);
+            }
+        }
+    }
+}
+ensure_assets_copied();
 
 function json_out($data, $code = 200) {
     http_response_code($code);
@@ -52,6 +70,28 @@ function body() {
 
 function require_login() {
     if (empty($_SESSION['user'])) fail('Please log in first.', 401);
+
+    $now = time();
+    $lastCheck = $_SESSION['user']['last_check'] ?? 0;
+    if ($now - $lastCheck > 30) {
+        try {
+            $pdo = db();
+            $st = $pdo->prepare('SELECT id, username, full_name, role, is_active FROM users WHERE id = ?');
+            $st->execute([$_SESSION['user']['id']]);
+            $u = $st->fetch();
+            if (!$u || empty($u['is_active'])) {
+                unset($_SESSION['user']);
+                fail('Your account has been deactivated or disabled.', 401);
+            }
+            $_SESSION['user']['role'] = $u['role'];
+            $_SESSION['user']['full_name'] = $u['full_name'];
+            $_SESSION['user']['username'] = $u['username'];
+            $_SESSION['user']['last_check'] = $now;
+        } catch (Throwable $e) {
+            // keep session on DB transient issue
+        }
+    }
+
     return $_SESSION['user'];
 }
 

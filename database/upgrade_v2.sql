@@ -18,6 +18,15 @@ CREATE TABLE IF NOT EXISTS activity_logs (
   CONSTRAINT fk_logs_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+-- 1b. Login Attempts table (independent of session, per username + IP)
+CREATE TABLE IF NOT EXISTS login_attempts (
+  id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  username     VARCHAR(50) NOT NULL,
+  ip_address   VARCHAR(45) NOT NULL,
+  attempted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_attempts_user_ip (username, ip_address, attempted_at)
+) ENGINE=InnoDB;
+
 -- 2. Inventory Movements table
 CREATE TABLE IF NOT EXISTS inventory_movements (
   id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -63,19 +72,19 @@ INSERT IGNORE INTO settings (setting_key, setting_value) VALUES
 ALTER TABLE products ADD COLUMN IF NOT EXISTS barcode VARCHAR(50) NULL UNIQUE AFTER name;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS cost_price DECIMAL(10,2) NULL DEFAULT 0.00 AFTER price;
 
--- Update existing sample products with images if missing
-UPDATE products SET image = 'noodles.jpg' WHERE id = 1 AND (image IS NULL OR image = '');
-UPDATE products SET image = 'sardines.jpg' WHERE id = 2 AND (image IS NULL OR image = '');
-UPDATE products SET image = 'biscuits.jpg' WHERE id = 3 AND (image IS NULL OR image = '');
-UPDATE products SET image = 'water.jpg' WHERE id = 4 AND (image IS NULL OR image = '');
-UPDATE products SET image = 'juice.jpg' WHERE id = 5 AND (image IS NULL OR image = '');
-UPDATE products SET image = 'coffee.jpg' WHERE id = 6 AND (image IS NULL OR image = '');
-UPDATE products SET image = 'notebook.jpg' WHERE id = 7 AND (image IS NULL OR image = '');
-UPDATE products SET image = 'ballpen.jpg' WHERE id = 8 AND (image IS NULL OR image = '');
-UPDATE products SET image = 'soap.jpg' WHERE id = 9 AND (image IS NULL OR image = '');
-UPDATE products SET image = 'shampoo.jpg' WHERE id = 10 AND (image IS NULL OR image = '');
-UPDATE products SET image = 'dishwashing.jpg' WHERE id = 11 AND (image IS NULL OR image = '');
-UPDATE products SET image = 'detergent.jpg' WHERE id = 12 AND (image IS NULL OR image = '');
+-- Update existing sample products with images
+UPDATE products SET image = 'ramen-noodles.jpg' WHERE id = 1;
+UPDATE products SET image = 'canned-soup.jpg' WHERE id = 2;
+UPDATE products SET image = 'cookies.jpg' WHERE id = 3;
+UPDATE products SET image = 'watermelon-drink.jpg' WHERE id = 4;
+UPDATE products SET image = 'orange-juice.jpg' WHERE id = 5;
+UPDATE products SET image = 'latte-coffee.jpg' WHERE id = 6;
+UPDATE products SET image = 'book-and-coffee.jpg' WHERE id = 7;
+UPDATE products SET image = NULL WHERE id = 8;
+UPDATE products SET image = 'soap-bars.jpg' WHERE id = 9;
+UPDATE products SET image = 'shampoo.jpg' WHERE id = 10;
+UPDATE products SET image = 'cleaning-spray.jpg' WHERE id = 11;
+UPDATE products SET image = 'cleaning-spray.jpg' WHERE id = 12;
 
 -- 6. Sales table modifications (discounts, tax, payment method, reference number, status, duplicate cart token)
 ALTER TABLE sales ADD COLUMN IF NOT EXISTS discount_id INT UNSIGNED NULL AFTER customer_id;

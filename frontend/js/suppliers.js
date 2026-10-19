@@ -18,7 +18,7 @@ async function load() {
         <button class="btn btn-sm btn-danger" onclick="del(${s.id})">Delete</button>
       </td>
     </tr>`).join('')
-    : '<tr><td colspan="8" class="empty">No suppliers found.</td></tr>';
+    : '<tr><td colspan="8" class="empty">No suppliers found. Add your first supplier.</td></tr>';
   } catch (e) { toastError(e); }
 }
 
@@ -30,12 +30,13 @@ function openForm(s) {
 }
 
 window.edit = id => openForm(suppliersList.find(s => s.id == id));
-window.del = async id => {
-  if (!confirm('Delete this supplier?')) return;
-  try {
-    toast((await api('suppliers/api.php?action=delete', { json: { id } })).message);
-    load();
-  } catch (e) { toastError(e); }
+window.del = id => {
+  confirmModal('Delete Supplier', 'Are you sure you want to delete this supplier?', async () => {
+    try {
+      toast((await api('suppliers/api.php?action=delete', { json: { id } })).message);
+      load();
+    } catch (e) { toastError(e); }
+  });
 };
 
 $('form').addEventListener('submit', async e => {

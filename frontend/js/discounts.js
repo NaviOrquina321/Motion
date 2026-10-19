@@ -15,7 +15,7 @@ async function load() {
         <button class="btn btn-sm btn-danger" onclick="del(${d.id})">Delete</button>
       </td>
     </tr>`).join('')
-    : '<tr><td colspan="6" class="empty">No discounts configured.</td></tr>';
+    : '<tr><td colspan="6" class="empty">No discounts configured yet. Add your first discount.</td></tr>';
   } catch (e) { toastError(e); }
 }
 
@@ -31,12 +31,13 @@ function openForm(d) {
 }
 
 window.edit = id => openForm(discountsList.find(d => d.id == id));
-window.del = async id => {
-  if (!confirm('Delete this discount?')) return;
-  try {
-    toast((await api('discounts/api.php?action=delete', { json: { id } })).message);
-    load();
-  } catch (e) { toastError(e); }
+window.del = id => {
+  confirmModal('Delete Discount', 'Are you sure you want to delete this discount?', async () => {
+    try {
+      toast((await api('discounts/api.php?action=delete', { json: { id } })).message);
+      load();
+    } catch (e) { toastError(e); }
+  });
 };
 
 $('form').addEventListener('submit', async e => {

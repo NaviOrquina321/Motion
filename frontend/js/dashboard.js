@@ -11,12 +11,33 @@
       ['Low Stock Alert', s.low_stock_count, 'at or below reorder level', s.low_stock_count > 0 ? 'warn' : ''],
     ].map(([l, v, sub, cls]) => `<div class="stat ${cls || ''}"><div class="label">${l}</div><div class="value">${v}</div><div class="sub">${sub}</div></div>`).join('');
 
-    // Low stock
+    // Render Daily Sales SVG Chart
+    const series = s.daily_series || [];
+    const maxRev = Math.max(...series.map(d => d.revenue), 10);
+    const chartHtml = `
+      <div style="display:flex; align-items:flex-end; gap:12px; height:140px; padding-bottom:10px; border-bottom:1px solid var(--border)">
+        ${series.map(d => {
+          const pct = Math.round((d.revenue / maxRev) * 100);
+          return `<div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end" title="${d.day}: ${money(d.revenue)} (${d.count} orders)">
+            <div style="width:100%; max-width:40px; background:var(--primary); height:${Math.max(pct, 4)}%; border-radius:4px 4px 0 0; transition:height 0.3s"></div>
+            <div style="font-size:10px; color:var(--muted); margin-top:6px">${d.day.slice(5)}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+    document.getElementById('chartWrap').innerHTML = chartHtml;
+
+    // Low stock list with links
     document.getElementById('lowStock').innerHTML = s.low_stock.length === 0
       ? '<div class="empty">All products are sufficiently stocked. ✅</div>'
-      : `<table><thead><tr><th>Product</th><th>Category</th><th class="num">Stock</th><th class="num">Reorder</th></tr></thead><tbody>` +
-        s.low_stock.map(p => `<tr><td><strong>${esc(p.name)}</strong></td><td>${esc(p.category_name)}</td>
-          <td class="num"><span class="badge badge-low">${p.stock_quantity}</span></td><td class="num">${p.reorder_level}</td></tr>`).join('') + '</tbody></table>';
+      : `<table><thead><tr><th>Product</th><th>Category</th><th class="num">Stock</th><th class="num">Reorder</th><th>Action</th></tr></thead><tbody>` +
+        s.low_stock.map(p => `<tr>
+          <td><strong>${esc(p.name)}</strong></td>
+          <td>${esc(p.category_name)}</td>
+          <td class="num"><span class="badge badge-low">${p.stock_quantity}</span></td>
+          <td class="num">${p.reorder_level}</td>
+          <td><a href="products.html?q=${encodeURIComponent(p.name)}" class="btn btn-sm btn-light">View Item</a></td>
+        </tr>`).join('') + '</tbody></table>';
 
     // Top products
     document.getElementById('topProducts').innerHTML = !s.top_products || s.top_products.length === 0

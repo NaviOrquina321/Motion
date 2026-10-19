@@ -11,12 +11,19 @@
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main">
     <header class="topbar">
-      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">☰</button>
       <h1>Dashboard</h1>
       <span class="user-chip" id="userInfo"></span>
     </header>
     <section class="content">
       <div class="cards" id="cards"></div>
+
+      <!-- Sales Trend Chart Panel -->
+      <div class="panel">
+        <h3>📈 Daily Sales Trend (7 Days)</h3>
+        <p style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">Daily revenue and order count</p>
+        <div id="chartWrap" style="height: 180px; width: 100%;"></div>
+      </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="row2">
         <div class="panel alert-panel">

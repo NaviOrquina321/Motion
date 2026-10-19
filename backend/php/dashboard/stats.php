@@ -1,5 +1,5 @@
 <?php
-/* GET -> numbers for the dashboard cards + Low Stock Alert + Top Products + Recent Sales. */
+/* GET -> numbers for the dashboard cards + Low Stock Alert + Top Products + Recent Sales + 7-Day Chart Series. */
 require_once __DIR__ . '/../config/helpers.php';
 require_login();
 $pdo = db();
@@ -42,13 +42,27 @@ $top_products = $pdo->query(
 
 // 5 Recent Sales
 $recent_sales = $pdo->query(
-    'SELECT s.id, s.total_amount, s.created_at, COALESCE(c.name, "Walk-in Customer") as customer_name, u.full_name as cashier_name
+    'SELECT s.id, s.total_amount, s.created_at, COALESCE(c.full_name, "Walk-in Customer") as customer_name, u.full_name as cashier_name
      FROM sales s
      LEFT JOIN customers c ON c.id = s.customer_id
      LEFT JOIN users u ON u.id = s.cashier_id
      ORDER BY s.id DESC
      LIMIT 5'
 )->fetchAll();
+
+// 7-day daily chart series
+$daily_series = [];
+for ($i = 6; $i >= 0; $i--) {
+    $date = date('Y-m-d', strtotime("-{$i} days"));
+    $st = $pdo->prepare('SELECT COALESCE(SUM(total_amount), 0.00) as rev, COUNT(*) as cnt FROM sales WHERE DATE(created_at) = ?');
+    $st->execute([$date]);
+    $row = $st->fetch();
+    $daily_series[] = [
+        'day' => $date,
+        'revenue' => (float)$row['rev'],
+        'count' => (int)$row['cnt']
+    ];
+}
 
 json_out([
     'success' => true,
@@ -66,5 +80,6 @@ json_out([
     'low_stock_count'    => count($low),
     'low_stock'          => $low,
     'top_products'       => $top_products,
-    'recent_sales'       => $recent_sales
+    'recent_sales'       => $recent_sales,
+    'daily_series'       => $daily_series
 ]);

@@ -42,14 +42,15 @@ if ($action === 'save') {
     only_post(false);
     verify_csrf();
     require_role('admin');
-    $id      = (int)($_POST['id'] ?? 0);
-    $name    = clean($_POST['name'] ?? '');
-    $barcode = clean($_POST['barcode'] ?? '');
-    $cat     = (int)($_POST['category_id'] ?? 0);
-    $price   = filter_var($_POST['price'] ?? '', FILTER_VALIDATE_FLOAT);
-    $cost    = filter_var($_POST['cost_price'] ?? '0', FILTER_VALIDATE_FLOAT);
-    $stock   = filter_var($_POST['stock_quantity'] ?? '', FILTER_VALIDATE_INT);
-    $reord   = filter_var($_POST['reorder_level'] ?? '', FILTER_VALIDATE_INT);
+    $id          = (int)($_POST['id'] ?? 0);
+    $name        = clean($_POST['name'] ?? '');
+    $barcode     = clean($_POST['barcode'] ?? '');
+    $cat         = (int)($_POST['category_id'] ?? 0);
+    $price       = filter_var($_POST['price'] ?? '', FILTER_VALIDATE_FLOAT);
+    $cost        = filter_var($_POST['cost_price'] ?? '0', FILTER_VALIDATE_FLOAT);
+    $stock       = filter_var($_POST['stock_quantity'] ?? '', FILTER_VALIDATE_INT);
+    $reord       = filter_var($_POST['reorder_level'] ?? '', FILTER_VALIDATE_INT);
+    $removeImage = !empty($_POST['remove_image']);
 
     if ($name === '' || strlen($name) > 120)  fail('Product name is required (max 120 characters).');
     if ($cat <= 0)                            fail('Please choose a category.');
@@ -66,9 +67,17 @@ if ($action === 'save') {
             $st->execute([$id]);
             $old = $st->fetchColumn();
             if ($old === false) fail('Product not found.', 404);
-            $pdo->prepare('UPDATE products SET name=?, barcode=?, category_id=?, price=?, cost_price=?, stock_quantity=?, reorder_level=?, image=COALESCE(?, image) WHERE id=?')
-                ->execute([$name, $barcodeVal, $cat, $price, $cost, $stock, $reord, $newImage, $id]);
-            if ($newImage) remove_image($old);
+
+            if ($removeImage) {
+                remove_image($old);
+                $imageVal = null;
+            } else {
+                $imageVal = $newImage ? $newImage : $old;
+                if ($newImage) remove_image($old);
+            }
+
+            $pdo->prepare('UPDATE products SET name=?, barcode=?, category_id=?, price=?, cost_price=?, stock_quantity=?, reorder_level=?, image=? WHERE id=?')
+                ->execute([$name, $barcodeVal, $cat, $price, $cost, $stock, $reord, $imageVal, $id]);
             log_activity('product_update', "Updated product ID #{$id}: {$name}");
         } else {
             $pdo->prepare('INSERT INTO products (name, barcode, category_id, price, cost_price, stock_quantity, reorder_level, image) VALUES (?,?,?,?,?,?,?,?)')

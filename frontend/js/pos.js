@@ -50,16 +50,25 @@ async function loadProducts() {
     const qs = new URLSearchParams({ action: 'list', q: query, category_id: catId });
     products = (await api('products/api.php?' + qs)).products;
 
-    $('grid').innerHTML = products.length ? products.map(p => `
-      <button class="pcard ${p.stock_quantity <= 0 ? 'out' : ''}" onclick="addToCart(${p.id})">
-        ${p.image ? `<img src="${imgUrl(p.image)}" alt="">` : '<div class="ph"></div>'}
-        <div>
-          <div class="n">${esc(p.name)}</div>
-          <div class="p">${money(p.price)}</div>
-        </div>
-        <div class="s">${p.stock_quantity > 0 ? p.stock_quantity + ' in stock' : 'Out of stock'}</div>
-      </button>`).join('')
-      : '<div class="empty">No products found.</div>';
+    $('grid').innerHTML = products.length ? products.map(p => {
+      const isOut = p.stock_quantity <= 0;
+      const isLow = !isOut && p.stock_quantity <= p.reorder_level;
+      let badge = `<span class="badge badge-ok">In stock (${p.stock_quantity})</span>`;
+      if (isOut) badge = `<span class="badge badge-danger">Out of stock</span>`;
+      else if (isLow) badge = `<span class="badge badge-low">Low: ${p.stock_quantity} left</span>`;
+
+      return `
+        <button class="pcard ${isOut ? 'out' : ''}" ${isOut ? 'disabled' : ''} onclick="addToCart(${p.id})" aria-label="${esc(p.name)} - ${money(p.price)}">
+          ${renderProductSlotImage(p)}
+          <div>
+            <div class="n">${esc(p.name)}</div>
+            <div class="p">${money(p.price)}</div>
+            <div class="s">${badge}</div>
+          </div>
+        </button>
+      `;
+    }).join('')
+    : '<div class="empty">No products found.</div>';
   } catch (e) { toastError(e); }
 }
 
@@ -90,7 +99,6 @@ window.removeItem = id => { cart = cart.filter(c => c.id != id); render(); };
 function calculateTotals() {
   const subtotal = Math.round(cart.reduce((s, c) => s + c.price * c.qty, 0) * 100) / 100;
 
-  // Discount calculation
   let discountAmount = 0.0;
   const selectedDiscId = $('discount').value;
   if (selectedDiscId) {
@@ -106,7 +114,6 @@ function calculateTotals() {
 
   const afterDiscount = Math.max(0, subtotal - discountAmount);
 
-  // Tax calculation
   let taxAmount = 0.0;
   const taxRate = parseFloat(storeSettings.tax_rate || 0);
   if (storeSettings.tax_enabled === '1' && taxRate > 0) {
@@ -125,11 +132,11 @@ function render() {
       <div class="price">${money(c.price)} × ${c.qty} = <strong>${money(c.price * c.qty)}</strong></div>
     </div>
     <div class="qty-controls">
-      <button class="qty-btn" onclick="changeQty(${c.id},-1)">−</button>
+      <button class="qty-btn" onclick="changeQty(${c.id},-1)" aria-label="Decrease quantity">−</button>
       <span>${c.qty}</span>
-      <button class="qty-btn" onclick="changeQty(${c.id},1)">+</button>
+      <button class="qty-btn" onclick="changeQty(${c.id},1)" aria-label="Increase quantity">+</button>
     </div>
-    <button class="btn btn-sm btn-danger" onclick="removeItem(${c.id})" style="margin-left:4px" aria-label="Remove">✕</button>
+    <button class="btn btn-sm btn-danger" onclick="removeItem(${c.id})" style="margin-left:4px" aria-label="Remove item">✕</button>
   </div>`).join('')
     : '<div class="empty">Ticket is empty.<br>Select a product to add.</div>';
 
@@ -177,7 +184,6 @@ async function checkout() {
     return ($('payError').textContent = 'Please enter reference number for digital payment.');
   }
 
-  // Prevent duplicate checkout
   $('payBtn').disabled = true;
 
   try {
@@ -196,7 +202,6 @@ async function checkout() {
     toast(d.message);
     showReceipt(d.receipt);
 
-    // Reset cart and generate new cart token
     cart = [];
     $('payment').value = '';
     $('refNum').value = '';
@@ -234,14 +239,35 @@ document.querySelectorAll('.pay-method-btn').forEach(btn => {
   };
 });
 
-// Barcode scanner logic on Enter key
+// Quick cash buttons
+document.querySelectorAll('.quick-cash-btn').forEach(btn => {
+  btn.onclick = () => {
+    const { grandTotal } = calculateTotals();
+    const val = btn.dataset.amt;
+    if (val === 'exact') {
+      $('payment').value = grandTotal.toFixed(2);
+    } else {
+      $('payment').value = parseFloat(val).toFixed(2);
+    }
+    render();
+  };
+});
+
+// F2 key to focus search, Enter key barcode scan
+document.addEventListener('keydown', e => {
+  if (e.key === 'F2') {
+    e.preventDefault();
+    $('search').focus();
+    $('search').select();
+  }
+});
+
 $('search').addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     e.preventDefault();
     const query = $('search').value.trim();
     if (!query) return;
 
-    // Check if query matches barcode or product ID directly
     const exact = products.find(p => p.barcode === query || p.id == query);
     if (exact) {
       addToCart(exact.id);

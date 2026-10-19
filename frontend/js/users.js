@@ -3,10 +3,11 @@ let list = [], me;
 async function load() {
   try {
     list = (await api('users/api.php?action=list')).users;
-    $('rows').innerHTML = list.map(u => `<tr><td>${u.id}</td><td>${esc(u.username)}</td><td>${esc(u.full_name)}</td><td>${u.role}</td>
-      <td><span class="badge ${u.is_active == 1 ? 'badge-ok' : 'badge-low'}">${u.is_active == 1 ? 'Active' : 'Inactive'}</span></td>
+    $('rows').innerHTML = list.length ? list.map(u => `<tr><td>${u.id}</td><td><strong>${esc(u.username)}</strong></td><td>${esc(u.full_name)}</td><td><span class="badge badge-info">${esc(u.role.toUpperCase())}</span></td>
+      <td><span class="badge ${u.is_active == 1 ? 'badge-ok' : 'badge-danger'}">${u.is_active == 1 ? 'Active' : 'Inactive'}</span></td>
       <td class="actions"><button class="btn btn-sm btn-light" onclick="edit(${u.id})">Edit</button>
-      ${u.id == me.id ? '' : `<button class="btn btn-sm btn-danger" onclick="del(${u.id})">Delete</button>`}</td></tr>`).join('');
+      ${u.id == me.id ? '' : `<button class="btn btn-sm btn-danger" onclick="del(${u.id})">Delete</button>`}</td></tr>`).join('')
+      : '<tr><td colspan="6" class="empty">No users found. Add your first user.</td></tr>';
   } catch (e) { toastError(e); }
 }
 function openForm(u) {
@@ -17,9 +18,10 @@ function openForm(u) {
   $('formError').textContent = ''; openModal('formModal');
 }
 window.edit = id => openForm(list.find(u => u.id == id));
-window.del = async id => {
-  if (!confirm('Delete this user?')) return;
-  try { toast((await api('users/api.php?action=delete', { json: { id } })).message); load(); } catch (e) { toastError(e); }
+window.del = id => {
+  confirmModal('Delete User', 'Are you sure you want to delete this user account?', async () => {
+    try { toast((await api('users/api.php?action=delete', { json: { id } })).message); load(); } catch (e) { toastError(e); }
+  });
 };
 $('form').addEventListener('submit', async e => {
   e.preventDefault();

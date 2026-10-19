@@ -7,9 +7,12 @@ $action = $_GET['action'] ?? 'list';
 
 if ($action === 'list') {
     $q = clean($_GET['q'] ?? '');
-    $sql = 'SELECT c.*, COALESCE(COUNT(s.id), 0) as total_orders, COALESCE(SUM(s.total_amount), 0.00) as total_spent
+    $sql = "SELECT c.*,
+                   COALESCE(COUNT(DISTINCT CASE WHEN s.payment_status = 'verified' THEN s.id END), 0) as total_orders,
+                   ROUND(COALESCE(SUM(CASE WHEN s.payment_status = 'verified' THEN s.total_amount ELSE 0 END), 0.00) -
+                         COALESCE((SELECT SUM(r.total_refund) FROM returns r JOIN sales s2 ON s2.id = r.sale_id WHERE s2.customer_id = c.id), 0.00), 2) as total_spent
             FROM customers c
-            LEFT JOIN sales s ON s.customer_id = c.id';
+            LEFT JOIN sales s ON s.customer_id = c.id";
     $args = [];
     if ($q !== '') {
         $sql .= ' WHERE c.full_name LIKE ? OR c.contact_number LIKE ? OR c.email LIKE ? OR c.id = ?';
@@ -31,7 +34,7 @@ if ($action === 'sales_history') {
     if (!$customer) fail('Customer not found.', 404);
 
     $stSales = $pdo->prepare(
-        'SELECT s.id, s.created_at, s.total_amount, s.payment_method, u.full_name as cashier_name
+        'SELECT s.id, s.created_at, s.total_amount, s.payment_method, s.payment_status, u.full_name as cashier_name
          FROM sales s
          JOIN users u ON u.id = s.cashier_id
          WHERE s.customer_id = ?

@@ -36,6 +36,20 @@ const money = n => '₱' + Number(n || 0).toLocaleString(undefined, { minimumFra
 const imgUrl = name => name ? API + 'uploads/' + encodeURIComponent(name) : '';
 const debounce = (fn, ms = 300) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
 
+function renderProductSlotImage(p) {
+  const initial = esc((p.name || 'P').charAt(0).toUpperCase());
+  if (p.image) {
+    return `<div class="slot-img-wrap">
+      <img src="${imgUrl(p.image)}" loading="lazy" alt="${esc(p.name)}"
+           onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+      <div class="slot-fallback" style="display:none"><span>📦</span><strong>${initial}</strong></div>
+    </div>`;
+  }
+  return `<div class="slot-img-wrap">
+    <div class="slot-fallback"><span>📦</span><strong>${initial}</strong></div>
+  </div>`;
+}
+
 function toast(msg, type = 'ok') {
   let box = document.getElementById('toast');
   if (!box) { box = document.createElement('div'); box.id = 'toast'; document.body.appendChild(box); }
@@ -60,6 +74,48 @@ document.addEventListener('click', e => {
   if (e.target.classList.contains('modal')) e.target.classList.remove('open');
   if (e.target.dataset && e.target.dataset.close) closeModal(e.target.dataset.close);
 });
+
+// Close open modal on Escape key press for accessibility
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const openModals = document.querySelectorAll('.modal.open');
+    openModals.forEach(m => m.classList.remove('open'));
+  }
+});
+
+// Custom delete confirmation modal replacing browser confirm()
+function confirmModal(title, message, onConfirm) {
+  let modal = document.getElementById('confirmActionModal');
+  if (!modal) {
+    const div = document.createElement('div');
+    div.id = 'confirmActionModal';
+    div.className = 'modal';
+    div.innerHTML = `<div class="modal-box">
+      <h2 id="confirmModalTitle">Confirm Action</h2>
+      <p id="confirmModalMessage" style="margin-bottom:20px; color:var(--text)"></p>
+      <div class="modal-actions">
+        <button class="btn btn-light" id="confirmModalCancelBtn" data-close="confirmActionModal">Cancel</button>
+        <button class="btn btn-danger" id="confirmModalOkBtn">Confirm</button>
+      </div>
+    </div>`;
+    document.body.appendChild(div);
+    modal = div;
+  }
+
+  document.getElementById('confirmModalTitle').textContent = title || 'Confirm Action';
+  document.getElementById('confirmModalMessage').textContent = message || 'Are you sure you want to proceed?';
+
+  const okBtn = document.getElementById('confirmModalOkBtn');
+  const newOkBtn = okBtn.cloneNode(true);
+  okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+
+  newOkBtn.onclick = () => {
+    closeModal('confirmActionModal');
+    if (typeof onConfirm === 'function') onConfirm();
+  };
+
+  openModal('confirmActionModal');
+}
 
 // Sidebar grouped like Loyverse Back Office
 const NAV_GROUPS = [
@@ -148,7 +204,7 @@ async function initPage(activeKey) {
       }
     }
   }
-  html += `</div><div class="sidebar-footer"><a href="#" id="logoutLink"><span>🚪</span>Logout</a></div>`;
+  html += `</div><div class="sidebar-footer"><a href="#" id="logoutLink" aria-label="Logout"><span>🚪</span>Logout</a></div>`;
 
   const sb = document.getElementById('sidebar');
   if (sb) sb.innerHTML = html;

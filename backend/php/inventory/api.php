@@ -4,6 +4,7 @@ require_once __DIR__ . '/../config/helpers.php';
 $user = require_role('admin');
 $pdo = db();
 $action = $_GET['action'] ?? 'overview';
+$forUpdate = ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') ? '' : ' FOR UPDATE';
 
 // Helper to record an inventory movement
 function add_movement($pdo, $productId, $type, $qty, $reason, $userId, $username) {
@@ -68,10 +69,11 @@ if ($action === 'overview') {
 if ($action === 'adjust') {
     only_post();
     $b = body();
-    $pid    = (int)($b['product_id'] ?? 0);
-    $type   = clean($b['type'] ?? '');
-    $qty    = (int)($b['quantity'] ?? 0);
-    $reason = clean($b['reason'] ?? '');
+    $pid       = (int)($b['product_id'] ?? 0);
+    $type      = clean($b['type'] ?? '');
+    $direction = clean($b['direction'] ?? '');
+    $qty       = (int)($b['quantity'] ?? 0);
+    $reason    = clean($b['reason'] ?? '');
 
     $allowedTypes = ['received', 'damaged', 'expired', 'adjustment'];
     if ($pid <= 0)                             fail('Select a valid product.');
@@ -79,14 +81,19 @@ if ($action === 'adjust') {
     if ($qty <= 0)                             fail('Quantity must be greater than 0.');
     if ($reason === '')                        fail('Reason is required for stock adjustments.');
 
+    if ($direction === '') {
+        $direction = ($type === 'received') ? 'add' : 'subtract';
+    }
+    if (!in_array($direction, ['add', 'subtract'], true)) fail('Invalid direction.');
+
     $pdo->beginTransaction();
     try {
-        $st = $pdo->prepare('SELECT id, name, stock_quantity FROM products WHERE id = ? FOR UPDATE');
+        $st = $pdo->prepare("SELECT id, name, stock_quantity FROM products WHERE id = ?{$forUpdate}");
         $st->execute([$pid]);
         $p = $st->fetch();
         if (!$p) throw new RuntimeException('Product not found.');
 
-        $stockDelta = $type === 'received' ? $qty : -$qty;
+        $stockDelta = ($direction === 'add') ? $qty : -$qty;
         $newStock = (int)$p['stock_quantity'] + $stockDelta;
         if ($newStock < 0) throw new RuntimeException("Adjustment would result in negative stock (current: {$p['stock_quantity']}).");
 
@@ -94,7 +101,7 @@ if ($action === 'adjust') {
         add_movement($pdo, $pid, $type, $stockDelta, $reason, $user['id'], $user['username']);
 
         $pdo->commit();
-        log_activity('stock_adjustment', "Adjusted stock for {$p['name']} ({$type} {$qty}): {$reason}");
+        log_activity('stock_adjustment', "Adjusted stock for {$p['name']} ({$type} {$direction} {$qty}): {$reason}");
     } catch (Throwable $e) {
         $pdo->rollBack();
         fail($e->getMessage());

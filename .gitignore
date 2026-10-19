@@ -4,6 +4,5 @@ __pycache__/
 backend/php/uploads/*
 !backend/php/uploads/.gitkeep
 !backend/php/uploads/.htaccess
-!backend/php/uploads/*.jpg
-!backend/php/uploads/*.png
-!backend/php/uploads/*.webp
+docs/screenshots/*
+!docs/screenshots/.gitkeep

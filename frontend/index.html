@@ -3,58 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Quick Buy Retail - Authentication</title>
+  <title>Login - Quick Buy Retail</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="login-wrap">
   <div class="login-card">
     <h1>🛍️ Quick Buy Retail</h1>
-    <p id="authSubtitle">Sign in to your account</p>
-
-    <!-- Tabs for Login / Register -->
-    <div style="display:flex; border-bottom:1px solid var(--border); margin-bottom:20px">
-      <button id="tabLogin" type="button" class="btn btn-light" style="flex:1; border-radius:8px 0 0 0; border:0; background:var(--primary); color:#fff; font-weight:600">Sign In (Login)</button>
-      <button id="tabRegister" type="button" class="btn btn-light" style="flex:1; border-radius:0 8px 0 0; border:0; background:#f1f5f9; color:var(--muted); font-weight:600">Sign Up (New User)</button>
-    </div>
-
+    <p>Sign in to continue</p>
     <div class="alert alert-error hidden" id="loginError"></div>
-
-    <!-- Login Form -->
     <form id="loginForm" novalidate>
       <div class="field">
         <label for="username">Username</label>
-        <input type="text" id="username" autocomplete="username" autofocus>
+        <input type="text" id="username" autocomplete="username" autofocus required>
       </div>
       <div class="field">
         <label for="password">Password</label>
         <div class="pw-wrap">
-          <input type="password" id="password" autocomplete="current-password">
-          <button type="button" class="pw-toggle" id="pwToggle">Show</button>
+          <input type="password" id="password" autocomplete="current-password" required>
+          <button type="button" class="pw-toggle" id="pwToggle" aria-label="Toggle password visibility">Show</button>
         </div>
       </div>
       <button class="btn" style="width:100%" id="loginBtn" type="submit">Sign In</button>
-    </form>
-
-    <!-- Registration Form -->
-    <form id="registerForm" class="hidden" novalidate>
-      <div class="field">
-        <label for="reg_fullName">Full Name *</label>
-        <input type="text" id="reg_fullName" placeholder="e.g. Maria Santos">
-      </div>
-      <div class="field">
-        <label for="reg_username">Username *</label>
-        <input type="text" id="reg_username" placeholder="3-50 letters/numbers">
-      </div>
-      <div class="field">
-        <label for="reg_password">Password *</label>
-        <input type="password" id="reg_password" placeholder="At least 6 characters">
-      </div>
-      <div class="field">
-        <label for="reg_confirmPassword">Confirm Password *</label>
-        <input type="password" id="reg_confirmPassword" placeholder="Repeat password">
-      </div>
-      <button class="btn btn-ok" style="width:100%" id="registerBtn" type="submit">Create Account & Sign In</button>
     </form>
   </div>
 </div>

@@ -11,7 +11,7 @@
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main">
     <header class="topbar">
-      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">☰</button>
       <h1>POS Terminal</h1>
       <span class="user-chip" id="userInfo"></span>
     </header>
@@ -20,7 +20,7 @@
         <!-- Left Column: Search, Categories, Product Cards Grid -->
         <div class="pos-left">
           <div class="toolbar">
-            <input class="grow" type="text" id="search" placeholder="🔍 Search products or scan barcode..." autofocus>
+            <input class="grow" type="text" id="search" placeholder="🔍 Search products or scan barcode (F2 to focus)..." autofocus aria-label="Search products or scan barcode">
           </div>
           <div class="pos-cats" id="catTabs">
             <button class="cat-tab active" data-id="">All Categories</button>
@@ -34,14 +34,16 @@
         <div class="pos-ticket">
           <h2>
             <span>🛒 Current Ticket</span>
-            <button class="btn btn-sm btn-light" id="clearBtn">Clear</button>
+            <button class="btn btn-sm btn-light" id="clearBtn" aria-label="Clear cart ticket">Clear</button>
           </h2>
 
           <div class="field" style="margin-bottom:8px">
+            <label for="customer">Customer</label>
             <select id="customer"><option value="">Walk-in Customer</option></select>
           </div>
 
           <div class="field" style="margin-bottom:8px">
+            <label for="discount">Discount</label>
             <select id="discount"><option value="">No Discount</option></select>
           </div>
 
@@ -65,12 +67,18 @@
           </div>
 
           <div class="field" id="refField" style="margin-bottom:8px; display:none">
-            <label>Reference Number *</label>
+            <label for="refNum">Reference Number *</label>
             <input type="text" id="refNum" placeholder="e.g. 123456789">
           </div>
 
           <div class="field" id="payField" style="margin-bottom:8px">
-            <label>Payment Amount (₱)</label>
+            <label for="payment">Payment Amount (₱)</label>
+            <div class="quick-cash-btns" id="quickCashBtns" style="margin-bottom:6px">
+              <button type="button" class="quick-cash-btn" data-amt="exact">Exact</button>
+              <button type="button" class="quick-cash-btn" data-amt="100">₱100</button>
+              <button type="button" class="quick-cash-btn" data-amt="500">₱500</button>
+              <button type="button" class="quick-cash-btn" data-amt="1000">₱1000</button>
+            </div>
             <input type="number" id="payment" min="0" step="0.01" placeholder="0.00" style="font-size:16px; font-weight:600">
           </div>
 

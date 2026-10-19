@@ -1,39 +1,128 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Products - Quick Buy Retail</title><link rel="stylesheet" href="css/style.css">
-</head><body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Products - Quick Buy Retail</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 <div class="layout">
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main">
-    <header class="topbar"><button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button><h1>Products</h1><span class="user-chip" id="userInfo"></span></header>
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">☰</button>
+      <h1>Products</h1>
+      <span class="user-chip" id="userInfo"></span>
+    </header>
     <section class="content">
       <div class="toolbar">
-        <input class="grow" type="text" id="search" placeholder="Search by name, barcode or ID...">
-        <select id="catFilter"><option value="">All categories</option></select>
-        <button class="btn" id="addBtn">+ Add Product</button></div>
-      <div class="panel"><div class="table-wrap"><table><thead><tr><th>Image</th><th>ID</th><th>Barcode</th><th>Name</th><th>Category</th><th class="num">Cost</th><th class="num">Price</th><th class="num">Stock</th><th class="num">Reorder</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table></div></div>
-      <div class="modal" id="formModal"><form class="modal-box" id="form" novalidate><h2 id="formTitle">Add Product</h2>
-        <input type="hidden" id="id">
-        <div class="field"><label>Product Name *</label><input type="text" id="name" maxlength="120"></div>
-        <div class="row2">
-          <div class="field"><label>Barcode</label><input type="text" id="barcode" maxlength="50" placeholder="e.g. 480000000000"></div>
-          <div class="field"><label>Category *</label><select id="category_id"></select></div>
+        <input class="grow" type="text" id="search" placeholder="Search by name, barcode or ID..." aria-label="Search products">
+        <select id="catFilter" aria-label="Filter by category"><option value="">All categories</option></select>
+
+        <div style="display:inline-flex; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden">
+          <button class="btn btn-light btn-sm active" id="viewGridBtn" style="border-radius:0" aria-label="Grid view">🔲 Grid</button>
+          <button class="btn btn-light btn-sm" id="viewTableBtn" style="border-radius:0" aria-label="Table view">☰ Table</button>
         </div>
-        <div class="row2">
-          <div class="field"><label>Cost Price *</label><input type="number" id="cost_price" min="0" step="0.01" value="0.00"></div>
-          <div class="field"><label>Selling Price *</label><input type="number" id="price" min="0" step="0.01"></div>
+
+        <button class="btn" id="addBtn">+ Add Product</button>
+      </div>
+
+      <!-- Grid View Container -->
+      <div id="gridWrap" class="product-grid" style="margin-bottom:24px"></div>
+
+      <!-- Table View Container -->
+      <div id="tableWrap" class="panel hidden">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>ID</th>
+                <th>Barcode</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th class="num">Cost</th>
+                <th class="num">Price</th>
+                <th class="num">Stock</th>
+                <th class="num">Reorder</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
         </div>
-        <div class="row2">
-          <div class="field"><label>Stock Quantity *</label><input type="number" id="stock_quantity" min="0" step="1"></div>
-          <div class="field"><label>Reorder Level *</label><input type="number" id="reorder_level" min="0" step="1" value="10"></div>
-        </div>
-        <div class="field"><label>Product Image (JPG/PNG/GIF/WEBP, max 2 MB)</label><input type="file" id="image" accept="image/*"></div>
-        <div class="form-error" id="formError"></div>
-        <div class="modal-actions"><button type="button" class="btn btn-light" data-close="formModal">Cancel</button><button class="btn">Save</button></div>
-      </form></div>
+      </div>
+
+      <!-- Add/Edit Modal -->
+      <div class="modal" id="formModal">
+        <form class="modal-box" id="form" novalidate>
+          <h2 id="formTitle">Add Product</h2>
+          <input type="hidden" id="id">
+          <input type="hidden" id="remove_image_val" value="0">
+
+          <div class="field">
+            <label for="name">Product Name *</label>
+            <input type="text" id="name" maxlength="120" required>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="barcode">Barcode</label>
+              <input type="text" id="barcode" maxlength="50" placeholder="e.g. 480000000000">
+            </div>
+            <div class="field">
+              <label for="category_id">Category *</label>
+              <select id="category_id" required></select>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="cost_price">Cost Price (₱) *</label>
+              <input type="number" id="cost_price" min="0" step="0.01" value="0.00" required>
+            </div>
+            <div class="field">
+              <label for="price">Selling Price (₱) *</label>
+              <input type="number" id="price" min="0" step="0.01" required>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="stock_quantity">Stock Quantity *</label>
+              <input type="number" id="stock_quantity" min="0" step="1" required>
+            </div>
+            <div class="field">
+              <label for="reorder_level">Reorder Level *</label>
+              <input type="number" id="reorder_level" min="0" step="1" value="10" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="image">Product Image (JPG/PNG/GIF/WEBP, max 2 MB)</label>
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px">
+              <div id="imagePreview" style="width:60px; height:60px; border-radius:8px; overflow:hidden; background:#f1f5f9; flex-shrink:0; display:flex; align-items:center; justify-content:center">
+                <span>📦</span>
+              </div>
+              <div>
+                <input type="file" id="image" accept="image/*">
+                <button type="button" class="btn btn-sm btn-danger hidden" id="removeImageBtn" style="margin-top:4px">Remove Image</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-error" id="formError"></div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-light" data-close="formModal">Cancel</button>
+            <button class="btn" id="saveBtn" type="submit">Save Product</button>
+          </div>
+        </form>
+      </div>
     </section>
   </main>
 </div>
-<script src="js/common.js"></script><script src="js/products.js"></script>
-</body></html>
+<script src="js/common.js"></script>
+<script src="js/products.js"></script>
+</body>
+</html>

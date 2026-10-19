@@ -4,6 +4,7 @@ require_once __DIR__ . '/../config/helpers.php';
 $user = require_role('admin');
 $pdo = db();
 $action = $_GET['action'] ?? 'list';
+$forUpdate = ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') ? '' : ' FOR UPDATE';
 
 if ($action === 'list') {
     $q      = clean($_GET['q'] ?? '');
@@ -75,12 +76,15 @@ if ($action === 'create') {
     $b = body();
     $supplierId = (int)($b['supplier_id'] ?? 0);
     $notes      = clean($b['notes'] ?? '');
-    $items      = $b['items'] ?? []; // [{product_id, unit_cost, quantity}]
+    $items      = $b['items'] ?? [];
 
-    if ($supplierId <= 0)                      fail('Please select a supplier.');
-    if (!is_array($items) || empty($items))   fail('Please add at least one product item to the purchase order.');
+    if ($supplierId <= 0)                    fail('Please select a supplier.');
+    if (!is_array($items) || empty($items)) fail('Please add at least one product item to the purchase order.');
 
-    $poNumber = 'PO-' . date('Ymd') . '-' . sprintf('%04d', rand(1, 9999));
+    // Check supplier existence
+    $stSup = $pdo->prepare('SELECT id FROM suppliers WHERE id = ?');
+    $stSup->execute([$supplierId]);
+    if (!$stSup->fetch()) fail('Selected supplier does not exist.');
 
     $pdo->beginTransaction();
     try {
@@ -88,12 +92,19 @@ if ($action === 'create') {
         $orderLines = [];
 
         foreach ($items as $it) {
-            $pid = (int)($it['product_id'] ?? 0);
+            $pid  = (int)($it['product_id'] ?? 0);
             $cost = filter_var($it['unit_cost'] ?? 0, FILTER_VALIDATE_FLOAT);
             $qty  = (int)($it['quantity'] ?? 0);
 
             if ($pid <= 0 || $qty <= 0 || $cost === false || $cost < 0) {
                 throw new RuntimeException('Invalid product item in purchase order list.');
+            }
+
+            // Check product existence
+            $stProd = $pdo->prepare('SELECT id FROM products WHERE id = ?');
+            $stProd->execute([$pid]);
+            if (!$stProd->fetch()) {
+                throw new RuntimeException("Product ID #{$pid} does not exist.");
             }
 
             $lineSub = round($cost * $qty, 2);
@@ -107,12 +118,18 @@ if ($action === 'create') {
             ];
         }
 
+        // Insert initial PO record to obtain DB ID for PO number generation
+        $tempNumber = 'TEMP-' . uniqid();
         $insPO = $pdo->prepare(
             'INSERT INTO purchase_orders (po_number, supplier_id, user_id, username, status, total_cost, notes)
              VALUES (?,?,?,?, "Ordered", ?, ?)'
         );
-        $insPO->execute([$poNumber, $supplierId, $user['id'], $user['username'], $totalCost, $notes]);
+        $insPO->execute([$tempNumber, $supplierId, $user['id'], $user['username'], $totalCost, $notes]);
         $poId = (int)$pdo->lastInsertId();
+
+        // Format PO number based on DB ID (e.g., PO-20261019-000012)
+        $poNumber = 'PO-' . date('Ymd') . '-' . sprintf('%06d', $poId);
+        $pdo->prepare('UPDATE purchase_orders SET po_number = ? WHERE id = ?')->execute([$poNumber, $poId]);
 
         $insItem = $pdo->prepare('INSERT INTO purchase_order_items (purchase_order_id, product_id, unit_cost, ordered_quantity, subtotal) VALUES (?,?,?,?,?)');
         foreach ($orderLines as $l) {
@@ -121,9 +138,13 @@ if ($action === 'create') {
 
         $pdo->commit();
         log_activity('po_create', "Created Purchase Order {$poNumber} (Total: ₱{$totalCost})");
-    } catch (Throwable $e) {
+    } catch (RuntimeException $e) {
         $pdo->rollBack();
         fail($e->getMessage());
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        error_log('PO create error: ' . $e->getMessage());
+        fail('Something went wrong.');
     }
 
     json_out(['success' => true, 'message' => "Purchase Order {$poNumber} created successfully.", 'po_id' => $poId]);
@@ -133,14 +154,14 @@ if ($action === 'receive') {
     only_post();
     $b = body();
     $poId  = (int)($b['po_id'] ?? 0);
-    $items = $b['items'] ?? []; // [{item_id, receive_quantity}]
+    $items = $b['items'] ?? [];
 
     if ($poId <= 0)                          fail('Invalid Purchase Order ID.');
     if (!is_array($items) || empty($items)) fail('No receive quantities provided.');
 
     $pdo->beginTransaction();
     try {
-        $stPO = $pdo->prepare('SELECT id, po_number, status FROM purchase_orders WHERE id = ? FOR UPDATE');
+        $stPO = $pdo->prepare("SELECT id, po_number, status FROM purchase_orders WHERE id = ?{$forUpdate}");
         $stPO->execute([$poId]);
         $po = $stPO->fetch();
 
@@ -157,14 +178,14 @@ if ($action === 'receive') {
 
             if ($poiId <= 0 || $recQty <= 0) continue;
 
-            $stPoi = $pdo->prepare('SELECT poi.*, p.name as product_name FROM purchase_order_items poi JOIN products p ON p.id = poi.product_id WHERE poi.id = ? AND poi.purchase_order_id = ? FOR UPDATE');
+            $stPoi = $pdo->prepare("SELECT poi.*, p.name as product_name FROM purchase_order_items poi JOIN products p ON p.id = poi.product_id WHERE poi.id = ? AND poi.purchase_order_id = ?{$forUpdate}");
             $stPoi->execute([$poiId, $poId]);
             $poi = $stPoi->fetch();
 
             if (!$poi) throw new RuntimeException("Item ID #{$poiId} not found in this Purchase Order.");
 
-            $ordered   = (int)$poi['ordered_quantity'];
-            $prevRec   = (int)$poi['received_quantity'];
+            $ordered     = (int)$poi['ordered_quantity'];
+            $prevRec     = (int)$poi['received_quantity'];
             $outstanding = $ordered - $prevRec;
 
             if ($outstanding <= 0) {
@@ -203,9 +224,13 @@ if ($action === 'receive') {
 
         $pdo->commit();
         log_activity('po_receive', "Received items for PO {$po['po_number']}. Status is now {$newStatus}");
-    } catch (Throwable $e) {
+    } catch (RuntimeException $e) {
         $pdo->rollBack();
         fail($e->getMessage());
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        error_log('PO receive error: ' . $e->getMessage());
+        fail('Something went wrong.');
     }
 
     json_out(['success' => true, 'message' => 'Items received and inventory updated successfully.']);
@@ -214,13 +239,21 @@ if ($action === 'receive') {
 if ($action === 'cancel') {
     only_post();
     $id = (int)(body()['id'] ?? 0);
-    $pdo->prepare('UPDATE purchase_orders SET status = "Cancelled" WHERE id = ? AND status IN ("Pending", "Ordered")')->execute([$id]);
+    $stPO = $pdo->prepare('SELECT status FROM purchase_orders WHERE id = ?');
+    $stPO->execute([$id]);
+    $po = $stPO->fetch();
+
+    if (!$po) fail('Purchase Order not found.');
+    if (in_array($po['status'], ['Partially Received', 'Completed'])) {
+        fail('Cannot cancel a Purchase Order that is already Partially Received or Completed.');
+    }
+
+    $pdo->prepare('UPDATE purchase_orders SET status = "Cancelled" WHERE id = ?')->execute([$id]);
     log_activity('po_cancel', "Cancelled Purchase Order ID #{$id}");
     json_out(['success' => true, 'message' => 'Purchase order cancelled.']);
 }
 
 if ($action === 'restocking_needs') {
-    // Products where stock <= reorder level
     $st = $pdo->query(
         'SELECT p.id, p.name, p.stock_quantity, p.reorder_level, COALESCE(p.cost_price, 0.00) as cost_price, c.name as category_name
          FROM products p

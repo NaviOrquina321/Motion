@@ -4,6 +4,7 @@ require_once __DIR__ . '/../config/helpers.php';
 $user = require_login();
 $pdo = db();
 $action = $_GET['action'] ?? 'history';
+$forUpdate = ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') ? '' : ' FOR UPDATE';
 
 function get_receipt($pdo, $id, $user = null) {
     $sql = 'SELECT s.id, s.cashier_id, s.total_amount, s.payment, s.change_amount, s.created_at,
@@ -38,7 +39,7 @@ if ($action === 'checkout') {
     $cartToken    = clean($b['cart_token'] ?? '');
 
     if (!is_array($items) || !$items)                     fail('The cart is empty.');
-    if ($payment === false)                               fail('Enter a valid payment amount.');
+    if ($payment === false && $payMethod === 'Cash')      fail('Enter a valid payment amount.');
     if (!in_array($payMethod, ['Cash', 'GCash', 'Maya'])) fail('Invalid payment method.');
     if (($payMethod === 'GCash' || $payMethod === 'Maya') && $refNum === '') {
         fail('Reference number is required for digital wallet payments.');
@@ -88,7 +89,7 @@ if ($action === 'checkout') {
     try {
         $lines = []; $subtotal = 0.0;
         foreach ($wanted as $pid => $qty) {
-            $st = $pdo->prepare('SELECT id, name, price, stock_quantity FROM products WHERE id = ? FOR UPDATE');
+            $st = $pdo->prepare("SELECT id, name, price, stock_quantity FROM products WHERE id = ?{$forUpdate}");
             $st->execute([$pid]);
             $p = $st->fetch();
             if (!$p) throw new RuntimeException('A product in the cart no longer exists.');
@@ -117,17 +118,17 @@ if ($action === 'checkout') {
 
         $total = round($afterDiscount + $taxAmount, 2);
 
-        if ($payMethod === 'Cash' && $payment < $total) {
-            throw new RuntimeException('Payment is less than the total amount.');
+        if ($payMethod === 'Cash') {
+            if ($payment < $total) {
+                throw new RuntimeException('Payment is less than the total amount.');
+            }
+            $change = round($payment - $total, 2);
+        } else {
+            // GCash / Maya: payment must equal total, change = 0
+            $payment = $total;
+            $change = 0.00;
         }
-        $change = $payMethod === 'Cash' ? round($payment - $total, 2) : 0.00;
 
-        // Payment status
-        /*
-         * Note for real payment gateway integration (e.g. Maya API / PayMongo / GCash Webhook):
-         * Here is where you would call the external payment gateway API to initiate or verify payment.
-         * For GCash/Maya, we store payment_status = 'pending' and ref number for admin manual verification.
-         */
         $payStatus = $payMethod === 'Cash' ? 'verified' : 'pending';
 
         if ($custId > 0) {
@@ -188,10 +189,46 @@ if ($action === 'verify_payment') {
 
     if ($saleId <= 0 || !in_array($status, ['verified', 'rejected'])) fail('Invalid payment verification parameters.');
 
-    $st = $pdo->prepare('UPDATE sales SET payment_status = ? WHERE id = ?');
-    $st->execute([$status, $saleId]);
+    $pdo->beginTransaction();
+    try {
+        $st = $pdo->prepare("SELECT * FROM sales WHERE id = ?{$forUpdate}");
+        $st->execute([$saleId]);
+        $sale = $st->fetch();
 
-    log_activity('payment_verify', "Set sale #{$saleId} payment status to {$status}");
+        if (!$sale) throw new RuntimeException('Sale transaction not found.');
+        if (!in_array($sale['payment_method'], ['GCash', 'Maya'])) {
+            throw new RuntimeException('Payment verification is only applicable to GCash or Maya transactions.');
+        }
+        if ($sale['payment_status'] !== 'pending') {
+            throw new RuntimeException("Payment status is already {$sale['payment_status']}. Can only verify or reject pending payments.");
+        }
+
+        $pdo->prepare('UPDATE sales SET payment_status = ? WHERE id = ?')->execute([$status, $saleId]);
+
+        if ($status === 'rejected') {
+            // Restore product stock and record inventory movement
+            $stItems = $pdo->prepare('SELECT product_id, quantity FROM sale_items WHERE sale_id = ?');
+            $stItems->execute([$saleId]);
+            $items = $stItems->fetchAll();
+
+            $addStock = $pdo->prepare('UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?');
+            $insMvt = $pdo->prepare('INSERT INTO inventory_movements (product_id, type, quantity, reason, user_id, username) VALUES (?, "returned", ?, ?, ?, ?)');
+
+            foreach ($items as $it) {
+                if ($it['product_id']) {
+                    $addStock->execute([(int)$it['quantity'], $it['product_id']]);
+                    $insMvt->execute([$it['product_id'], (int)$it['quantity'], "Rejected Payment Sale #{$saleId}", $user['id'], $user['username']]);
+                }
+            }
+        }
+
+        $pdo->commit();
+        log_activity('payment_verify', "Set sale #{$saleId} payment status to {$status}");
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        fail($e->getMessage());
+    }
+
     json_out(['success' => true, 'message' => "Payment status updated to {$status}."]);
 }
 
