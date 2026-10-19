@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales History - Quick Buy Retail</title><link rel="stylesheet" href="css/style.css">
+</head><body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <header class="topbar"><button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button><h1>Sales History</h1><span class="user-chip" id="userInfo"></span></header>
+    <section class="content">
+      <div class="toolbar"><input class="grow" type="text" id="search" placeholder="Search by transaction ID, cashier or customer...">
+        <label>From <input type="date" id="from"></label><label>To <input type="date" id="to"></label><button class="btn btn-light" id="resetBtn">Reset</button></div>
+      <div class="panel"><div class="table-wrap"><table><thead><tr><th>Transaction ID</th><th>Date</th><th>Cashier</th><th>Customer</th><th class="num">Total</th><th class="num">Payment</th><th class="num">Change</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></div>
+      <div id="modalHost"></div>
+    </section>
+  </main>
+</div>
+<script src="js/common.js"></script><script src="js/sales.js"></script>
+</body></html>

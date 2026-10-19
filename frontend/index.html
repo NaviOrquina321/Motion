@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login - Quick Buy Retail</title><link rel="stylesheet" href="css/style.css">
+</head><body>
+<div class="login-wrap"><form class="login-card" id="loginForm" novalidate>
+  <h1>🛍️ Quick Buy Retail</h1><p>Sign in to continue</p>
+  <div class="alert alert-error hidden" id="loginError"></div>
+  <div class="field"><label for="username">Username</label><input type="text" id="username" autocomplete="username" autofocus></div>
+  <div class="field"><label for="password">Password</label>
+    <div class="pw-wrap"><input type="password" id="password" autocomplete="current-password">
+    <button type="button" class="pw-toggle" id="pwToggle">Show</button></div></div>
+  <button class="btn" style="width:100%" id="loginBtn" type="submit">Login</button>
+</form></div>
+<script src="js/common.js"></script><script src="js/login.js"></script>
+</body></html>
