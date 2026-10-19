@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales / POS - Quick Buy Retail</title><link rel="stylesheet" href="css/style.css">
+</head><body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <header class="topbar"><button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button><h1>Sales / POS</h1><span class="user-chip" id="userInfo"></span></header>
+    <section class="content">
+      <div class="pos">
+        <div>
+          <div class="toolbar"><input class="grow" type="text" id="search" placeholder="Search products by name or ID..."><select id="catFilter"><option value="">All categories</option></select></div>
+          <div class="product-grid" id="grid"></div>
+        </div>
+        <div class="panel cart"><h2>🛒 Current Sale</h2>
+          <div class="field"><label>Customer (optional)</label><select id="customer"><option value="">Walk-in customer</option></select></div>
+          <div id="cartItems"></div>
+          <div class="totals"><div><span>Subtotal</span><span id="subtotal">₱0.00</span></div><div class="grand"><span>Total</span><span id="total">₱0.00</span></div></div>
+          <div class="field"><label>Payment amount</label><input type="number" id="payment" min="0" step="0.01" placeholder="0.00"></div>
+          <div class="totals"><div><span>Change</span><strong id="change">₱0.00</strong></div></div>
+          <div class="form-error" id="payError"></div>
+          <div style="display:flex;gap:8px"><button class="btn btn-light" id="clearBtn">Clear</button><button class="btn btn-ok" style="flex:1" id="payBtn">Complete Transaction</button></div>
+        </div>
+      </div>
+      <div id="modalHost"></div>
+    </section>
+  </main>
+</div>
+<script src="js/common.js"></script><script src="js/pos.js"></script>
+</body></html>
