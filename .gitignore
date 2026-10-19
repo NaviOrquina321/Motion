@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.DS_Store
+backend/php/uploads/*
+!backend/php/uploads/.gitkeep
+!backend/php/uploads/.htaccess
+docs/screenshots/*
+!docs/screenshots/.gitkeep
