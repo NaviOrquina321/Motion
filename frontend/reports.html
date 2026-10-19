@@ -1,21 +1,87 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Reports - Quick Buy Retail</title><link rel="stylesheet" href="css/style.css">
-</head><body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reports & Analytics - Quick Buy Retail</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 <div class="layout">
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main">
-    <header class="topbar"><button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button><h1>Reports</h1><span class="user-chip" id="userInfo"></span></header>
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <h1>Reports & Analytics</h1>
+      <span class="user-chip" id="userInfo"></span>
+    </header>
     <section class="content">
-      <div class="toolbar"><select id="days"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select>
-        <span class="user-chip">Calculated by the Python report service</span></div>
+      <div class="toolbar">
+        <select id="daysSelect">
+          <option value="7">Last 7 days</option>
+          <option value="30" selected>Last 30 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="custom">Custom Date Range</option>
+        </select>
+        <div id="dateRangeBox" class="hidden" style="display:inline-flex; gap:8px; align-items:center">
+          <label>From <input type="date" id="from"></label>
+          <label>To <input type="date" id="to"></label>
+          <button class="btn btn-sm" id="applyDatesBtn">Filter</button>
+        </div>
+        <div class="grow"></div>
+        <button class="btn btn-light" id="exportSalesCsvBtn">📥 Export Sales CSV</button>
+        <button class="btn btn-light" id="exportReturnsCsvBtn">📥 Export Returns CSV</button>
+        <button class="btn btn-light" id="printReportBtn" onclick="window.print()">🖨️ Print Summary</button>
+      </div>
+
+      <!-- Stat Cards -->
       <div class="cards" id="cards"></div>
-      <div class="panel"><h2>Daily Revenue</h2><div class="bars" id="bars"></div></div>
-      <div class="row2"><div class="panel"><h2>Top Products</h2><div class="table-wrap" id="top"></div></div>
-      <div class="panel"><h2>Revenue by Category</h2><div class="table-wrap" id="cat"></div></div></div>
+
+      <!-- Daily Revenue Bar Chart -->
+      <div class="panel">
+        <h2>Daily Revenue Trend</h2>
+        <div class="bars" id="bars" style="margin-top:12px"></div>
+      </div>
+
+      <!-- Top Sellers vs Slow Movers -->
+      <div class="row2">
+        <div class="panel">
+          <h2>🔥 Top 5 Selling Products</h2>
+          <div class="table-wrap" id="top" style="margin-top:12px"></div>
+        </div>
+        <div class="panel">
+          <h2>🐌 5 Slow Moving Items</h2>
+          <div class="table-wrap" id="slow" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <!-- Category Revenue vs Payment Method Breakdown -->
+      <div class="row2">
+        <div class="panel">
+          <h2>🏷️ Revenue by Category</h2>
+          <div class="table-wrap" id="cat" style="margin-top:12px"></div>
+        </div>
+        <div class="panel">
+          <h2>💳 Revenue by Payment Method</h2>
+          <div class="table-wrap" id="payments" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <!-- Valuation & PO Summary -->
+      <div class="row2">
+        <div class="panel">
+          <h2>📦 Current Inventory Valuation</h2>
+          <div id="valuation" style="margin-top:12px"></div>
+        </div>
+        <div class="panel">
+          <h2>🔄 Returns & PO Summary</h2>
+          <div id="otherSummary" style="margin-top:12px"></div>
+        </div>
+      </div>
     </section>
   </main>
 </div>
-<script src="js/common.js"></script><script src="js/reports.js"></script>
-</body></html>
+<script src="js/common.js"></script>
+<script src="js/reports.js"></script>
+</body>
+</html>

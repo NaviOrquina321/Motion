@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Purchase Orders - Quick Buy Retail</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <h1>Purchase Orders</h1>
+      <span class="user-chip" id="userInfo"></span>
+    </header>
+    <section class="content">
+      <div class="toolbar">
+        <input class="grow" type="text" id="search" placeholder="Search PO #, supplier or notes...">
+        <select id="statusFilter">
+          <option value="">All Statuses</option>
+          <option value="Ordered">Ordered</option>
+          <option value="Partially Received">Partially Received</option>
+          <option value="Completed">Completed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+        <button class="btn btn-warn" id="restockListBtn">⚠️ Needs Restocking</button>
+        <button class="btn" id="createPoBtn">+ Create PO</button>
+      </div>
+
+      <div class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>PO Number</th>
+                <th>Date</th>
+                <th>Supplier</th>
+                <th>Status</th>
+                <th class="num">Total Cost</th>
+                <th>Created By</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Create PO Modal -->
+      <div class="modal" id="createPoModal">
+        <form class="modal-box" id="poForm" style="max-width: 700px;" novalidate>
+          <h2>Create Purchase Order</h2>
+          <div class="field">
+            <label>Supplier *</label>
+            <select id="po_supplier_id" required><option value="">-- Choose Supplier --</option></select>
+          </div>
+
+          <div style="margin: 16px 0">
+            <label style="font-weight:600">PO Items List</label>
+            <div class="table-wrap" style="margin-top: 8px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th class="num" style="width:120px">Unit Cost (₱)</th>
+                    <th class="num" style="width:100px">Order Qty</th>
+                    <th class="num" style="width:120px">Subtotal</th>
+                    <th style="width:40px"></th>
+                  </tr>
+                </thead>
+                <tbody id="poItemsRows"></tbody>
+              </table>
+            </div>
+            <button type="button" class="btn btn-sm btn-light" id="addItemRowBtn" style="margin-top:8px">+ Add Product Row</button>
+          </div>
+
+          <div class="field">
+            <label>Order Total Cost</label>
+            <div style="font-size:20px; font-weight:700" id="poGrandTotal">₱0.00</div>
+          </div>
+
+          <div class="field">
+            <label>Notes / Order Remarks</label>
+            <input type="text" id="po_notes" placeholder="e.g. Expedited delivery requested">
+          </div>
+
+          <div class="form-error" id="poFormError"></div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-light" data-close="createPoModal">Cancel</button>
+            <button class="btn" type="submit">Submit Purchase Order</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- View / Receive PO Modal -->
+      <div class="modal" id="viewPoModal">
+        <div class="modal-box" style="max-width: 750px;">
+          <h2 id="viewPoTitle">Purchase Order Details</h2>
+          <div id="viewPoBody"></div>
+          <div class="form-error" id="receiveError"></div>
+          <div class="modal-actions" id="viewPoActions" style="margin-top:16px"></div>
+        </div>
+      </div>
+
+      <!-- Restocking Alert Modal -->
+      <div class="modal" id="restockModal">
+        <div class="modal-box" style="max-width: 650px;">
+          <h2>⚠️ Products Needing Restock</h2>
+          <p style="font-size:12px; color:var(--muted); margin-bottom:12px">Products with current stock equal to or below reorder level</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th class="num">In Stock</th>
+                  <th class="num">Reorder</th>
+                  <th class="num">Est. Unit Cost</th>
+                </tr>
+              </thead>
+              <tbody id="restockRows"></tbody>
+            </table>
+          </div>
+          <div class="modal-actions" style="margin-top:16px">
+            <button class="btn btn-light" data-close="restockModal">Close</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="js/common.js"></script>
+<script src="js/purchase_orders.js"></script>
+</body>
+</html>

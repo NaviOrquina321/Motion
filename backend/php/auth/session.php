@@ -1,4 +1,10 @@
 <?php
-/* GET -> returns the logged-in user (or 401). Every page calls this on load. */
+/* GET -> Returns current user session info and CSRF token. */
 require_once __DIR__ . '/../config/helpers.php';
-json_out(['success' => true, 'user' => require_login()]);
+$u = require_login();
+
+json_out([
+    'success'    => true,
+    'user'       => $u,
+    'csrf_token' => $_SESSION['csrf_token'] ?? ''
+]);

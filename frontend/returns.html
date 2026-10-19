@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Returns & Refunds - Quick Buy Retail</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <h1>Returns & Refunds</h1>
+      <span class="user-chip" id="userInfo"></span>
+    </header>
+    <section class="content">
+      <!-- Search Sale Section -->
+      <div class="panel">
+        <h2>🔍 Find Sale Transaction to Return</h2>
+        <div class="toolbar" style="margin-top:12px; margin-bottom:0">
+          <input type="number" id="saleSearchId" placeholder="Enter Transaction # (e.g. 1)" style="max-width:260px">
+          <button class="btn" id="searchSaleBtn">Lookup Sale</button>
+        </div>
+      </div>
+
+      <!-- Sale Return Form Area -->
+      <div id="returnArea" class="hidden">
+        <div class="panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+            <h3>Receipt Summary - <span id="saleTitle"></span></h3>
+            <span class="user-chip" id="saleCustomer"></span>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th class="num">Unit Price</th>
+                  <th class="num">Sold Qty</th>
+                  <th class="num">Prev Returned</th>
+                  <th class="num">Return Qty</th>
+                  <th class="num">Line Refund</th>
+                  <th style="text-align:center">Restock to Inventory?</th>
+                </tr>
+              </thead>
+              <tbody id="saleItemsRows"></tbody>
+            </table>
+          </div>
+
+          <form id="processReturnForm" style="margin-top:20px; border-top:1px solid var(--border); padding-top:16px">
+            <div class="row2">
+              <div class="field">
+                <label>Refund Method *</label>
+                <select id="refund_method">
+                  <option value="Cash">💵 Cash</option>
+                  <option value="GCash">📱 GCash</option>
+                  <option value="Maya">💳 Maya</option>
+                  <option value="Store Credit">🎟️ Store Credit</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Reason for Return *</label>
+                <input type="text" id="reason" required placeholder="e.g. Defective item, wrong size, customer changed mind">
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px">
+              <div style="font-size:18px; font-weight:700">Total Refund: <span id="totalRefundAmt" style="color:var(--danger)">₱0.00</span></div>
+              <button class="btn btn-danger btn-lg" type="submit" id="submitReturnBtn">Process Refund & Return</button>
+            </div>
+            <div class="form-error" id="returnError"></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Processed Returns History -->
+      <div class="panel">
+        <h2>📜 Processed Returns History</h2>
+        <div class="table-wrap" style="margin-top:12px">
+          <table>
+            <thead>
+              <tr>
+                <th>Return #</th>
+                <th>Date</th>
+                <th>Sale Txn #</th>
+                <th class="num">Refund Amount</th>
+                <th>Method</th>
+                <th>Reason</th>
+                <th>Staff</th>
+              </tr>
+            </thead>
+            <tbody id="returnsHistoryRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="js/common.js"></script>
+<script src="js/returns.js"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stock Overview - Quick Buy Retail</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <h1>Stock Overview</h1>
+      <span class="user-chip" id="userInfo"></span>
+    </header>
+    <section class="content">
+      <div class="cards" id="summaryCards"></div>
+
+      <div class="toolbar">
+        <input class="grow" type="text" id="search" placeholder="Search by product name or ID...">
+        <select id="catFilter"><option value="">All categories</option></select>
+        <select id="statusFilter">
+          <option value="">All Stock Levels</option>
+          <option value="in_stock">In Stock</option>
+          <option value="low">Low Stock</option>
+          <option value="out">Out of Stock</option>
+        </select>
+      </div>
+
+      <div class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Product</th>
+                <th>Category</th>
+                <th class="num">In Stock</th>
+                <th class="num">Reorder</th>
+                <th>Status</th>
+                <th class="num">Retail Price</th>
+                <th class="num">Retail Valuation</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="js/common.js"></script>
+<script src="js/stock_overview.js"></script>
+</body>
+</html>

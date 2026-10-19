@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Suppliers - Quick Buy Retail</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <h1>Suppliers</h1>
+      <span class="user-chip" id="userInfo"></span>
+    </header>
+    <section class="content">
+      <div class="toolbar">
+        <input class="grow" type="text" id="search" placeholder="Search supplier by name, contact or email...">
+        <button class="btn" id="addBtn">+ Add Supplier</button>
+      </div>
+
+      <div class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Supplier Name</th>
+                <th>Contact Person</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th class="num">POs</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal" id="formModal">
+        <form class="modal-box" id="form" novalidate>
+          <h2 id="formTitle">Add Supplier</h2>
+          <input type="hidden" id="id">
+          <div class="field">
+            <label>Supplier Name *</label>
+            <input type="text" id="name" maxlength="120" required placeholder="e.g. Universal Food Wholesalers Inc.">
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Contact Person</label>
+              <input type="text" id="contact_person" maxlength="100" placeholder="e.g. Alex Tan">
+            </div>
+            <div class="field">
+              <label>Phone Number</label>
+              <input type="text" id="phone" maxlength="20" placeholder="e.g. 0917-111-2222">
+            </div>
+          </div>
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="email" maxlength="120" placeholder="e.g. sales@wholesaler.com">
+          </div>
+          <div class="field">
+            <label>Address</label>
+            <input type="text" id="address" maxlength="255" placeholder="e.g. Warehouse 4, Industrial Zone, Davao City">
+          </div>
+          <div class="form-error" id="formError"></div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-light" data-close="formModal">Cancel</button>
+            <button class="btn" type="submit">Save</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="js/common.js"></script>
+<script src="js/suppliers.js"></script>
+</body>
+</html>

@@ -5,7 +5,7 @@ const DB_NAME = 'quick_buy_retail';
 const DB_USER = 'root';
 const DB_PASS = '';
 
-// Command used to run Python ("python" on Windows, "python3" on Mac/Linux)
+// Command used to run Python ('python' on Windows, 'python3' on Mac/Linux)
 const PYTHON_BIN = 'python3';
 
 function db() {
