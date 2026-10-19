@@ -1,0 +1,3 @@
+# Apache only: never run scripts from the uploads folder
+php_flag engine off
+RemoveHandler .php .phtml
