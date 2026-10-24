@@ -1,0 +1,98 @@
+/* CloudVault Main SaaS Stylesheet */
+:root {
+  --bg-navy: #0F172A;
+  --card-bg: #1E293B;
+  --card-border: #334155;
+  --primary-blue: #2563EB;
+  --hover-blue: #1D4ED8;
+  --cyan-accent: #06B6D4;
+  --text-main: #F1F5F9;
+  --text-muted: #94A3B8;
+  --success-green: #22C55E;
+  --warning-orange: #F59E0B;
+  --error-red: #EF4444;
+}
+
+[data-bs-theme="light"] {
+  --bg-navy: #F8FAFC;
+  --card-bg: #FFFFFF;
+  --card-border: #E2E8F0;
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+}
+
+body {
+  background-color: var(--bg-navy);
+  color: var(--text-main);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.bg-navy {
+  background-color: var(--bg-navy) !important;
+}
+
+.card-custom {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-custom:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+
+.btn-primary:hover {
+  background-color: var(--hover-blue);
+  border-color: var(--hover-blue);
+}
+
+.drop-zone {
+  border: 2px dashed var(--primary-blue);
+  border-radius: 12px;
+  background-color: rgba(37, 99, 235, 0.05);
+  padding: 40px;
+  text-center: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.drop-zone.dragover {
+  background-color: rgba(37, 99, 235, 0.15);
+  border-color: var(--cyan-accent);
+}
+
+/* Sidebar Styles */
+.sidebar {
+  min-height: 100vh;
+  background-color: var(--card-bg);
+  border-right: 1px solid var(--card-border);
+}
+
+.nav-link-custom {
+  color: var(--text-muted);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.nav-link-custom:hover, .nav-link-custom.active {
+  color: var(--text-main);
+  background-color: rgba(37, 99, 235, 0.15);
+}
+
+.progress-thin {
+  height: 8px;
+  border-radius: 4px;
+}

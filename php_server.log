@@ -1,0 +1,158 @@
+[Sat Oct 24 14:45:05 2026] PHP 8.3.6 Development Server (http://127.0.0.1:8000) started
+[Sat Oct 24 14:45:48 2026] 127.0.0.1:57252 Accepted
+[Sat Oct 24 14:45:48 2026] 127.0.0.1:57252 [200]: GET /index.php
+[Sat Oct 24 14:45:48 2026] 127.0.0.1:57252 Closing
+[Sat Oct 24 14:45:48 2026] 127.0.0.1:57264 Accepted
+[Sat Oct 24 14:45:48 2026] 127.0.0.1:57264 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:45:48 2026] 127.0.0.1:57264 Closing
+[Sat Oct 24 14:45:50 2026] 127.0.0.1:57274 Accepted
+[Sat Oct 24 14:45:50 2026] PHP Fatal error:  Uncaught Exception: Database Connection Error: SQLSTATE[HY000] [2002] Connection refused in /app/config/database.php:35
+Stack trace:
+#0 /app/app/Models/SystemSetting.php(6): Database::getConnection()
+#1 /app/public/login.php(8): SystemSetting::get()
+#2 {main}
+  thrown in /app/config/database.php on line 35
+[Sat Oct 24 14:45:50 2026] 127.0.0.1:57274 [500]: GET /login.php - Uncaught Exception: Database Connection Error: SQLSTATE[HY000] [2002] Connection refused in /app/config/database.php:35
+Stack trace:
+#0 /app/app/Models/SystemSetting.php(6): Database::getConnection()
+#1 /app/public/login.php(8): SystemSetting::get()
+#2 {main}
+  thrown in /app/config/database.php on line 35
+[Sat Oct 24 14:45:50 2026] 127.0.0.1:57274 Closing
+[Sat Oct 24 14:46:33 2026] 127.0.0.1:39912 Accepted
+[Sat Oct 24 14:46:33 2026] 127.0.0.1:39912 [200]: GET /index.php
+[Sat Oct 24 14:46:33 2026] 127.0.0.1:39912 Closing
+[Sat Oct 24 14:46:33 2026] 127.0.0.1:39918 Accepted
+[Sat Oct 24 14:46:33 2026] 127.0.0.1:39918 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:46:33 2026] 127.0.0.1:39918 Closing
+[Sat Oct 24 14:46:34 2026] 127.0.0.1:39932 Accepted
+[Sat Oct 24 14:46:34 2026] 127.0.0.1:39932 [302]: GET /login.php
+[Sat Oct 24 14:46:34 2026] 127.0.0.1:39932 Closing
+[Sat Oct 24 14:46:34 2026] 127.0.0.1:39940 Accepted
+[Sat Oct 24 14:46:34 2026] 127.0.0.1:39940 [200]: GET /install.php
+[Sat Oct 24 14:46:34 2026] 127.0.0.1:39940 Closing
+[Sat Oct 24 14:46:34 2026] 127.0.0.1:39948 Accepted
+[Sat Oct 24 14:46:34 2026] 127.0.0.1:39948 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:46:34 2026] 127.0.0.1:39948 Closing
+[Sat Oct 24 14:46:54 2026] 127.0.0.1:39892 Accepted
+[Sat Oct 24 14:46:54 2026] 127.0.0.1:39892 [200]: GET /install.php
+[Sat Oct 24 14:46:54 2026] 127.0.0.1:39892 Closing
+[Sat Oct 24 14:46:54 2026] 127.0.0.1:39900 Accepted
+[Sat Oct 24 14:46:54 2026] 127.0.0.1:39900 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:46:54 2026] 127.0.0.1:39900 Closing
+[Sat Oct 24 14:47:09 2026] 127.0.0.1:49464 Accepted
+[Sat Oct 24 14:47:09 2026] 127.0.0.1:49464 [200]: GET /install.php
+[Sat Oct 24 14:47:09 2026] 127.0.0.1:49464 Closing
+[Sat Oct 24 14:47:09 2026] 127.0.0.1:49476 Accepted
+[Sat Oct 24 14:47:09 2026] 127.0.0.1:49476 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:47:09 2026] 127.0.0.1:49476 Closing
+[Sat Oct 24 14:47:10 2026] 127.0.0.1:49486 Accepted
+[Sat Oct 24 14:47:10 2026] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000]: General error: 1 near "DUPLICATE": syntax error in /app/app/Models/SystemSetting.php:15
+Stack trace:
+#0 /app/app/Models/SystemSetting.php(15): PDO->prepare()
+#1 /app/app/Controllers/AuthController.php(44): SystemSetting::set()
+#2 /app/public/install.php(20): AuthController::install()
+#3 {main}
+  thrown in /app/app/Models/SystemSetting.php on line 15
+[Sat Oct 24 14:47:10 2026] 127.0.0.1:49486 [500]: POST /install.php - Uncaught PDOException: SQLSTATE[HY000]: General error: 1 near "DUPLICATE": syntax error in /app/app/Models/SystemSetting.php:15
+Stack trace:
+#0 /app/app/Models/SystemSetting.php(15): PDO->prepare()
+#1 /app/app/Controllers/AuthController.php(44): SystemSetting::set()
+#2 /app/public/install.php(20): AuthController::install()
+#3 {main}
+  thrown in /app/app/Models/SystemSetting.php on line 15
+[Sat Oct 24 14:47:10 2026] 127.0.0.1:49486 Closing
+[Sat Oct 24 14:47:58 2026] 127.0.0.1:51144 Accepted
+[Sat Oct 24 14:47:58 2026] 127.0.0.1:51144 [302]: GET /login.php
+[Sat Oct 24 14:47:58 2026] 127.0.0.1:51144 Closing
+[Sat Oct 24 14:47:58 2026] 127.0.0.1:51160 Accepted
+[Sat Oct 24 14:47:58 2026] 127.0.0.1:51160 [200]: GET /install.php
+[Sat Oct 24 14:47:58 2026] 127.0.0.1:51160 Closing
+[Sat Oct 24 14:47:58 2026] 127.0.0.1:51170 Accepted
+[Sat Oct 24 14:47:58 2026] 127.0.0.1:51170 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:47:58 2026] 127.0.0.1:51170 Closing
+[Sat Oct 24 14:48:48 2026] 127.0.0.1:53188 Accepted
+[Sat Oct 24 14:48:48 2026] 127.0.0.1:53188 [200]: GET /install.php
+[Sat Oct 24 14:48:48 2026] 127.0.0.1:53188 Closing
+[Sat Oct 24 14:48:48 2026] 127.0.0.1:53204 Accepted
+[Sat Oct 24 14:48:48 2026] 127.0.0.1:53204 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:48:48 2026] 127.0.0.1:53204 Closing
+[Sat Oct 24 14:49:03 2026] 127.0.0.1:60368 Accepted
+[Sat Oct 24 14:49:03 2026] 127.0.0.1:60368 [200]: GET /install.php
+[Sat Oct 24 14:49:03 2026] 127.0.0.1:60368 Closing
+[Sat Oct 24 14:49:03 2026] 127.0.0.1:60376 Accepted
+[Sat Oct 24 14:49:03 2026] 127.0.0.1:60376 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:49:03 2026] 127.0.0.1:60376 Closing
+[Sat Oct 24 14:49:04 2026] 127.0.0.1:60392 Accepted
+[Sat Oct 24 14:49:04 2026] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 19 UNIQUE constraint failed: users.email in /app/app/Models/User.php:91
+Stack trace:
+#0 /app/app/Models/User.php(91): PDOStatement->execute()
+#1 /app/app/Controllers/AuthController.php(43): User->save()
+#2 /app/public/install.php(20): AuthController::install()
+#3 {main}
+  thrown in /app/app/Models/User.php on line 91
+[Sat Oct 24 14:49:04 2026] 127.0.0.1:60392 [500]: POST /install.php - Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 19 UNIQUE constraint failed: users.email in /app/app/Models/User.php:91
+Stack trace:
+#0 /app/app/Models/User.php(91): PDOStatement->execute()
+#1 /app/app/Controllers/AuthController.php(43): User->save()
+#2 /app/public/install.php(20): AuthController::install()
+#3 {main}
+  thrown in /app/app/Models/User.php on line 91
+[Sat Oct 24 14:49:04 2026] 127.0.0.1:60392 Closing
+[Sat Oct 24 14:49:35 2026] 127.0.0.1:59118 Accepted
+[Sat Oct 24 14:49:35 2026] 127.0.0.1:59118 [200]: GET /install.php
+[Sat Oct 24 14:49:35 2026] 127.0.0.1:59118 Closing
+[Sat Oct 24 14:49:35 2026] 127.0.0.1:59120 Accepted
+[Sat Oct 24 14:49:35 2026] 127.0.0.1:59120 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:49:35 2026] 127.0.0.1:59120 Closing
+[Sat Oct 24 14:49:36 2026] 127.0.0.1:59134 Accepted
+[Sat Oct 24 14:49:36 2026] 127.0.0.1:59134 [302]: POST /install.php
+[Sat Oct 24 14:49:36 2026] 127.0.0.1:59134 Closing
+[Sat Oct 24 14:49:36 2026] 127.0.0.1:59146 Accepted
+[Sat Oct 24 14:49:36 2026] 127.0.0.1:59146 [200]: GET /login.php?installed=1
+[Sat Oct 24 14:49:36 2026] 127.0.0.1:59146 Closing
+[Sat Oct 24 14:49:36 2026] 127.0.0.1:59162 Accepted
+[Sat Oct 24 14:49:36 2026] 127.0.0.1:59162 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:49:36 2026] 127.0.0.1:59162 Closing
+[Sat Oct 24 14:49:56 2026] 127.0.0.1:40298 Accepted
+[Sat Oct 24 14:49:56 2026] 127.0.0.1:40298 [302]: GET /install.php
+[Sat Oct 24 14:49:56 2026] 127.0.0.1:40298 Closing
+[Sat Oct 24 14:49:56 2026] 127.0.0.1:40312 Accepted
+[Sat Oct 24 14:49:56 2026] 127.0.0.1:40312 [200]: GET /login.php
+[Sat Oct 24 14:49:56 2026] 127.0.0.1:40312 Closing
+[Sat Oct 24 14:49:56 2026] 127.0.0.1:40324 Accepted
+[Sat Oct 24 14:49:56 2026] 127.0.0.1:40324 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:49:56 2026] 127.0.0.1:40324 Closing
+[Sat Oct 24 14:49:57 2026] 127.0.0.1:40340 Accepted
+[Sat Oct 24 14:49:57 2026] 127.0.0.1:40340 [302]: POST /login.php
+[Sat Oct 24 14:49:57 2026] 127.0.0.1:40340 Closing
+[Sat Oct 24 14:49:57 2026] 127.0.0.1:40348 Accepted
+[Sat Oct 24 14:49:57 2026] 127.0.0.1:40348 [200]: GET /dashboard.php
+[Sat Oct 24 14:49:57 2026] 127.0.0.1:40348 Closing
+[Sat Oct 24 14:49:57 2026] 127.0.0.1:40352 Accepted
+[Sat Oct 24 14:49:57 2026] 127.0.0.1:40362 Accepted
+[Sat Oct 24 14:49:57 2026] 127.0.0.1:40352 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:49:57 2026] 127.0.0.1:40362 [200]: GET /assets/js/app.js
+[Sat Oct 24 14:49:57 2026] 127.0.0.1:40352 Closing
+[Sat Oct 24 14:49:57 2026] 127.0.0.1:40362 Closing
+[Sat Oct 24 14:51:03 2026] 127.0.0.1:54602 Accepted
+[Sat Oct 24 14:51:03 2026] 127.0.0.1:54602 [302]: GET /install.php
+[Sat Oct 24 14:51:03 2026] 127.0.0.1:54602 Closing
+[Sat Oct 24 14:51:03 2026] 127.0.0.1:54616 Accepted
+[Sat Oct 24 14:51:03 2026] 127.0.0.1:54616 [200]: GET /login.php
+[Sat Oct 24 14:51:03 2026] 127.0.0.1:54616 Closing
+[Sat Oct 24 14:51:03 2026] 127.0.0.1:54632 Accepted
+[Sat Oct 24 14:51:03 2026] 127.0.0.1:54632 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:51:03 2026] 127.0.0.1:54632 Closing
+[Sat Oct 24 14:51:04 2026] 127.0.0.1:54644 Accepted
+[Sat Oct 24 14:51:04 2026] 127.0.0.1:54644 [302]: POST /login.php
+[Sat Oct 24 14:51:04 2026] 127.0.0.1:54644 Closing
+[Sat Oct 24 14:51:04 2026] 127.0.0.1:54658 Accepted
+[Sat Oct 24 14:51:04 2026] 127.0.0.1:54658 [200]: GET /dashboard.php
+[Sat Oct 24 14:51:04 2026] 127.0.0.1:54658 Closing
+[Sat Oct 24 14:51:04 2026] 127.0.0.1:54670 Accepted
+[Sat Oct 24 14:51:04 2026] 127.0.0.1:54672 Accepted
+[Sat Oct 24 14:51:04 2026] 127.0.0.1:54670 [200]: GET /assets/css/style.css
+[Sat Oct 24 14:51:04 2026] 127.0.0.1:54672 [200]: GET /assets/js/app.js
+[Sat Oct 24 14:51:04 2026] 127.0.0.1:54670 Closing
+[Sat Oct 24 14:51:04 2026] 127.0.0.1:54672 Closing
