@@ -1,12 +1,15 @@
 <?php
 /**
  * CloudVault Configuration & Database Connection Helper
+ * InfinityFree & Shared Hosting Compatible
  */
 
-define('DB_HOST', getenv('DB_HOST') ?: '127.0.0.1');
+// InfinityFree MySQL Database Credentials
+// Replace these values with your InfinityFree MySQL details from cPanel:
+define('DB_HOST', getenv('DB_HOST') ?: '127.0.0.1'); // e.g. 'sql123.infinityfree.com'
 define('DB_PORT', getenv('DB_PORT') ?: '3306');
-define('DB_NAME', getenv('DB_NAME') ?: 'cloudvault_db');
-define('DB_USER', getenv('DB_USER') ?: 'root');
+define('DB_NAME', getenv('DB_NAME') ?: 'cloudvault_db'); // e.g. 'if0_12345678_cloudvault'
+define('DB_USER', getenv('DB_USER') ?: 'root'); // e.g. 'if0_12345678'
 define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : '');
 define('DB_CHARSET', 'utf8mb4');
 
@@ -30,7 +33,7 @@ class Database {
             try {
                 self::$instance = new PDO($dsn, DB_USER, DB_PASS, $options);
             } catch (PDOException $e) {
-                // Fallback to SQLite database in storage directory if MySQL server is not running locally
+                // Local testing fallback to SQLite if MySQL service is not available locally
                 $sqlitePath = STORAGE_PATH . '/cloudvault.sqlite';
                 self::$instance = new PDO("sqlite:" . $sqlitePath, null, null, [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,

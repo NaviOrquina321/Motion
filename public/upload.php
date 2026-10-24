@@ -30,18 +30,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (empty($_FILES['project_files']['name'])) {
             $error = 'Please select project files or a ZIP archive to upload.';
         } else {
-            try {
-                $storageRef = uniqid('proj_') . '_' . time();
+            $storageRef = uniqid('proj_') . '_' . time();
+            $targetDir = PROJECTS_STORAGE_PATH . '/' . $storageRef;
 
-                // Process File Uploads
+            try {
+                // 1. Process Main Project Uploads
                 $uploadResult = BackupService::processUpload($_FILES['project_files'], $storageRef, $excludedFiles);
 
-                // Quota check
+                // Quota Check
                 if ($userObj->getUsedStorage() + $uploadResult['total_size'] > $userObj->storage_quota) {
                     throw new Exception("Storage quota exceeded. Please delete existing projects or upgrade quota.");
                 }
 
-                // Analyze Uploaded Project
+                // 2. Process Attached Database Backup prior to analysis so it is detected
+                $dbBackupInfo = null;
+                if (!empty($_FILES['database_backup']['tmp_name']) && $_FILES['database_backup']['error'] === UPLOAD_ERR_OK) {
+                    $dbOriginalName = basename($_FILES['database_backup']['name']);
+                    $dbTargetDir = $uploadResult['storage_directory'] . '/database';
+                    if (!file_exists($dbTargetDir)) {
+                        mkdir($dbTargetDir, 0755, true);
+                    }
+
+                    $dbDest = $dbTargetDir . '/' . $dbOriginalName;
+                    if (move_uploaded_file($_FILES['database_backup']['tmp_name'], $dbDest)) {
+                        $dbBackupInfo = [
+                            'original_filename' => $dbOriginalName,
+                            'storage_reference' => $storageRef . '/database/' . $dbOriginalName,
+                            'file_size' => filesize($dbDest),
+                            'checksum_sha256' => hash_file('sha256', $dbDest)
+                        ];
+                    }
+                }
+
+                // 3. Analyze Uploaded Directory Structure & Files
                 $analysis = ProjectAnalyzer::analyze($uploadResult['storage_directory']);
 
                 // Create Project Entry
@@ -79,24 +100,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmtReq->execute([$version->id, $req['type'], $req['name'], $req['version'], $req['source'], $req['status']]);
                 }
 
-                // Save Database Backup if uploaded separately or detected
-                if (!empty($_FILES['database_backup']['tmp_name']) && $_FILES['database_backup']['error'] === UPLOAD_ERR_OK) {
-                    $dbOriginalName = basename($_FILES['database_backup']['name']);
-                    $dbStorageRef = $storageRef . '/database/' . $dbOriginalName;
-                    $dbTargetDir = PROJECTS_STORAGE_PATH . '/' . $storageRef . '/database';
-                    if (!file_exists($dbTargetDir)) mkdir($dbTargetDir, 0755, true);
-
-                    $dbDest = $dbTargetDir . '/' . $dbOriginalName;
-                    if (move_uploaded_file($_FILES['database_backup']['tmp_name'], $dbDest)) {
-                        $stmtDb = $db->prepare("INSERT INTO database_backups (project_version_id, original_filename, storage_reference, file_size, checksum_sha256) VALUES (?, ?, ?, ?, ?)");
-                        $stmtDb->execute([
-                            $version->id,
-                            $dbOriginalName,
-                            $storageRef . '/database/' . $dbOriginalName,
-                            filesize($dbDest),
-                            hash_file('sha256', $dbDest)
-                        ]);
-                    }
+                // Save Database Backup Entry if present
+                if ($dbBackupInfo) {
+                    $stmtDb = $db->prepare("INSERT INTO database_backups (project_version_id, original_filename, storage_reference, file_size, checksum_sha256) VALUES (?, ?, ?, ?, ?)");
+                    $stmtDb->execute([
+                        $version->id,
+                        $dbBackupInfo['original_filename'],
+                        $dbBackupInfo['storage_reference'],
+                        $dbBackupInfo['file_size'],
+                        $dbBackupInfo['checksum_sha256']
+                    ]);
                 }
 
                 ActivityLog::log($userObj->id, "Uploaded new project: {$projectName}", $project->id);
@@ -104,6 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $analysisResult = $analysis;
 
             } catch (Exception $e) {
+                // Cleanup orphaned storage directory on error
+                BackupService::deleteDirectory($targetDir);
                 $error = "Upload Failed: " . $e->getMessage();
             }
         }

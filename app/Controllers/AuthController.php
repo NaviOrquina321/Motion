@@ -32,6 +32,14 @@ class AuthController {
             return ['success' => false, 'error' => 'Password must be at least 8 characters long.'];
         }
 
+        if (User::emailExists($email)) {
+            return ['success' => false, 'error' => 'Email address is already registered.'];
+        }
+
+        if (User::usernameExists($username)) {
+            return ['success' => false, 'error' => 'Username is already taken.'];
+        }
+
         $admin = new User();
         $admin->full_name = $fullName;
         $admin->username = $username;

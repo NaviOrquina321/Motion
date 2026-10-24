@@ -14,12 +14,20 @@ class BackupService {
         $processedFiles = [];
         $totalBytes = 0;
 
-        // Check if payload is a single ZIP file
-        if (isset($filesPayload['tmp_name']) && !is_array($filesPayload['tmp_name']) && strtolower(pathinfo($filesPayload['name'], PATHINFO_EXTENSION)) === 'zip') {
+        // Check if payload contains a single ZIP archive upload
+        $isSingleZip = isset($filesPayload['tmp_name']) && !is_array($filesPayload['tmp_name'])
+            && strtolower(pathinfo($filesPayload['name'] ?? '', PATHINFO_EXTENSION)) === 'zip';
+
+        $isArrayZip = isset($filesPayload['tmp_name']) && is_array($filesPayload['tmp_name']) && count($filesPayload['tmp_name']) === 1
+            && strtolower(pathinfo($filesPayload['name'][0] ?? '', PATHINFO_EXTENSION)) === 'zip';
+
+        if ($isSingleZip) {
             return self::extractZipUpload($filesPayload['tmp_name'], $targetDir, $excludedFiles);
+        } elseif ($isArrayZip && $filesPayload['error'][0] === UPLOAD_ERR_OK) {
+            return self::extractZipUpload($filesPayload['tmp_name'][0], $targetDir, $excludedFiles);
         }
 
-        // Multi-file folder or archive handling
+        // Multi-file folder upload handling
         if (isset($filesPayload['tmp_name']) && is_array($filesPayload['tmp_name'])) {
             $count = count($filesPayload['tmp_name']);
             for ($i = 0; $i < $count; $i++) {
@@ -28,7 +36,7 @@ class BackupService {
                 $relPath = $filesPayload['full_path'][$i] ?? $filesPayload['name'][$i];
                 $relPath = self::sanitizeRelativePath($relPath);
 
-                if (self::isExcluded($relPath, $excludedFiles)) {
+                if (empty($relPath) || self::isExcluded($relPath, $excludedFiles)) {
                     continue;
                 }
 
@@ -74,7 +82,7 @@ class BackupService {
             $stat = $zip->statIndex($i);
             $relPath = self::sanitizeRelativePath($stat['name']);
 
-            // Ignore directories or invalid paths
+            // Ignore directories or empty paths
             if (substr($stat['name'], -1) === '/' || empty($relPath)) {
                 continue;
             }
@@ -123,23 +131,49 @@ class BackupService {
     }
 
     public static function sanitizeRelativePath(string $path): string {
+        // Standardize slashes
         $path = str_replace('\\', '/', $path);
-        // Prevent directory traversal
+
+        // Split path components and remove traversal segments
         $parts = explode('/', $path);
         $safeParts = [];
+
         foreach ($parts as $part) {
-            if ($part === '' || $part === '.' || $part === '..') continue;
-            $safeParts[] = preg_replace('/[^a-zA-Z0-9_\-\.\ \(\)\[\]]/', '', $part);
+            // Filter out empty, current dir (.), or parent dir (..)
+            if ($part === '' || $part === '.' || $part === '..') {
+                continue;
+            }
+
+            // Remove null bytes and dangerous control characters
+            $part = str_replace("\0", '', $part);
+            $part = preg_replace('/[\x00-\x1F\x7F]/', '', $part);
+
+            if ($part !== '') {
+                $safeParts[] = $part;
+            }
         }
+
         return implode('/', $safeParts);
     }
 
     private static function isExcluded(string $relPath, array $excludedFiles): bool {
         foreach ($excludedFiles as $excluded) {
+            $excluded = trim($excluded);
+            if (empty($excluded)) continue;
             if ($relPath === $excluded || str_starts_with($relPath, $excluded . '/')) {
                 return true;
             }
         }
         return false;
+    }
+
+    public static function deleteDirectory(string $dir): void {
+        if (!file_exists($dir)) return;
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dir . '/' . $file;
+            is_dir($path) ? self::deleteDirectory($path) : @unlink($path);
+        }
+        @rmdir($dir);
     }
 }
