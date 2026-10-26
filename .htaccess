@@ -1,0 +1,15 @@
+# CloudVault Apache Configuration for InfinityFree / Shared Hosting
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Redirect root domain or subdirectory requests to public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Block direct access to hidden files (.env, .gitignore, etc.)
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
