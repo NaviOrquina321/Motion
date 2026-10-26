@@ -34,7 +34,7 @@ function renderHeader(string $title, string $activeNav = ''): void {
         <!-- Sidebar Navigation -->
         <div class="col-md-3 col-lg-2 sidebar p-3 d-flex flex-column">
             <a href="dashboard.php" class="d-flex align-items-center mb-4 text-decoration-none text-light px-2">
-                <i class="bi bi-cloud-arrow-up-fill fs-3 text-primary me-2"></i>
+                <i class="bi bi-cloud-arrow-up-fill fs-3 text-gradient me-2"></i>
                 <span class="fs-4 fw-bold">CloudVault</span>
             </a>
 
@@ -52,6 +52,11 @@ function renderHeader(string $title, string $activeNav = ''): void {
                 <li class="nav-item mb-1">
                     <a href="projects.php" class="nav-link-custom <?= $activeNav === 'projects' ? 'active' : '' ?>">
                         <i class="bi bi-folder2-open"></i> My Projects
+                    </a>
+                </li>
+                <li class="nav-item mb-1">
+                    <a href="showcase.php" class="nav-link-custom text-info <?= $activeNav === 'showcase' ? 'active' : '' ?>">
+                        <i class="bi bi-film"></i> AI Motion Showcase
                     </a>
                 </li>
                 <li class="nav-item mb-1">
