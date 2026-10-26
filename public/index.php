@@ -23,7 +23,7 @@ $user = AuthMiddleware::getCurrentUser();
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary py-3">
         <div class="container">
             <a class="navbar-brand fw-bold text-primary fs-3" href="index.php">
-                <i class="bi bi-cloud-arrow-up-fill me-2"></i>CloudVault
+                <i class="bi bi-cloud-arrow-up-fill me-2 text-gradient-cyan"></i>CloudVault
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
                 <span class="navbar-toggler-icon"></span>
@@ -32,13 +32,12 @@ $user = AuthMiddleware::getCurrentUser();
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link active" href="#features">Features</a></li>
                     <li class="nav-item"><a class="nav-link" href="#how-it-works">How It Works</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#languages">Supported Stacks</a></li>
                 </ul>
                 <div class="d-flex gap-2">
                     <?php if ($user): ?>
                         <a href="dashboard.php" class="btn btn-primary fw-bold px-4">Go to Dashboard <i class="bi bi-arrow-right ms-1"></i></a>
                     <?php else: ?>
-                        <a href="login.php" class="btn btn-outline-light px-4">Login</a>
+                        <a href="login.php" class="btn btn-outline-light rounded-pill px-4">Login</a>
                         <a href="register.php" class="btn btn-primary fw-bold px-4">Get Started</a>
                     <?php endif; ?>
                 </div>
@@ -49,15 +48,19 @@ $user = AuthMiddleware::getCurrentUser();
     <!-- Hero Section -->
     <section class="py-5 text-center my-5">
         <div class="container py-5">
-            <h1 class="display-3 fw-bold text-light mb-4">
-                Store Your Projects.<br><span class="text-primary">Transfer Without Losing What Matters.</span>
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-dark border border-secondary mb-4">
+                <span class="badge bg-primary rounded-pill">New</span>
+                <small class="text-muted">Smart Backup Analysis & Dependency Reports</small>
+            </div>
+            <h1 class="display-3 fw-extrabold text-light mb-4">
+                Store Your Projects.<br><span class="text-gradient">Transfer Without Losing What Matters.</span>
             </h1>
             <p class="lead text-muted mx-auto mb-5" style="max-width: 750px;">
                 CloudVault helps developers securely back up, organize, transfer, and restore complete programming projects while preserving essential nested folders, database backups, dependency manifests, and checksum integrity.
             </p>
             <div class="d-flex justify-content-center gap-3">
                 <a href="register.php" class="btn btn-primary btn-lg px-5 py-3 fw-bold shadow">Start Backing Up Free</a>
-                <a href="#features" class="btn btn-outline-secondary btn-lg px-5 py-3">Explore Features</a>
+                <a href="#features" class="btn btn-outline-secondary rounded-pill btn-lg px-5 py-3">Explore Features</a>
             </div>
         </div>
     </section>

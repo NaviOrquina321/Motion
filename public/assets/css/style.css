@@ -1,14 +1,18 @@
-/* CloudVault Main SaaS Stylesheet */
+/* CloudVault Kario-Inspired SaaS Design System */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 :root {
-  --bg-navy: #0F172A;
-  --card-bg: #1E293B;
-  --card-border: #334155;
+  --bg-navy: #090D16;
+  --card-bg: #121827;
+  --card-border: #1F293D;
+  --card-glow: rgba(37, 99, 235, 0.08);
   --primary-blue: #2563EB;
   --hover-blue: #1D4ED8;
   --cyan-accent: #06B6D4;
-  --text-main: #F1F5F9;
+  --purple-glow: #8B5CF6;
+  --text-main: #F8FAFC;
   --text-muted: #94A3B8;
-  --success-green: #22C55E;
+  --success-green: #10B981;
   --warning-orange: #F59E0B;
   --error-red: #EF4444;
 }
@@ -17,6 +21,7 @@
   --bg-navy: #F8FAFC;
   --card-bg: #FFFFFF;
   --card-border: #E2E8F0;
+  --card-glow: rgba(37, 99, 235, 0.04);
   --text-main: #0F172A;
   --text-muted: #64748B;
 }
@@ -24,7 +29,7 @@
 body {
   background-color: var(--bg-navy);
   color: var(--text-main);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -32,41 +37,83 @@ body {
   background-color: var(--bg-navy) !important;
 }
 
+small.fw-bold {
+  letter-spacing: 0.03em;
+}
+
+/* Gradient text accents */
+.text-gradient {
+  background: linear-gradient(135deg, #38BDF8 0%, #818CF8 50%, #C084FC 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #22D3EE 0%, #3B82F6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Kario-style Glass Cards */
 .card-custom {
-  background-color: var(--card-bg);
+  background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 12px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px var(--card-glow);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
 }
 
 .card-custom:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  border-color: rgba(56, 189, 248, 0.3);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 15px var(--card-glow);
 }
 
+/* Button & Pill Styles */
 .btn-primary {
-  background-color: var(--primary-blue);
-  border-color: var(--primary-blue);
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  border: none;
+  border-radius: 9999px;
+  padding: 10px 24px;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
-  background-color: var(--hover-blue);
-  border-color: var(--hover-blue);
+  background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.btn-outline-primary {
+  border-radius: 9999px;
+  border-color: var(--primary-blue);
+  color: #38BDF8;
+  font-weight: 600;
+  padding: 6px 18px;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+  color: #FFFFFF;
 }
 
 .drop-zone {
-  border: 2px dashed var(--primary-blue);
-  border-radius: 12px;
-  background-color: rgba(37, 99, 235, 0.05);
+  border: 2px dashed rgba(56, 189, 248, 0.4);
+  border-radius: 16px;
+  background: rgba(18, 24, 39, 0.6);
+  backdrop-filter: blur(10px);
   padding: 40px;
   text-center: center;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.25s ease;
 }
 
-.drop-zone.dragover {
-  background-color: rgba(37, 99, 235, 0.15);
+.drop-zone:hover, .drop-zone.dragover {
   border-color: var(--cyan-accent);
+  background: rgba(37, 99, 235, 0.1);
 }
 
 /* Sidebar Styles */
@@ -78,9 +125,9 @@ body {
 
 .nav-link-custom {
   color: var(--text-muted);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 16px;
-  font-weight: 500;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -88,11 +135,12 @@ body {
 }
 
 .nav-link-custom:hover, .nav-link-custom.active {
-  color: var(--text-main);
-  background-color: rgba(37, 99, 235, 0.15);
+  color: #FFFFFF;
+  background: rgba(37, 99, 235, 0.18);
+  border-left: 3px solid #38BDF8;
 }
 
 .progress-thin {
   height: 8px;
-  border-radius: 4px;
+  border-radius: 9999px;
 }
